@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xzp.smartcampus.common.model.BaseModel;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 数据隔离基础业务类
@@ -14,6 +14,8 @@ import java.util.List;
  * @author Administrator
  */
 public class IsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> extends BaseService<M, T> implements IBaseService<T> {
+
+
     /**
      * 设置数据隔离的参数
      *
@@ -50,17 +52,7 @@ public class IsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @param models models
      */
     @Override
-    protected void initTenant(List models) {
-
-    }
-
-    /**
-     * 插入数据
-     *
-     * @param model 数据
-     */
-    @Override
-    public void insert(T model) {
+    protected void initTenant(Collection models) {
 
     }
 }

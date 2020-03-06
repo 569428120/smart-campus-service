@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xzp.smartcampus.common.model.BaseModel;
 import com.xzp.smartcampus.common.vo.PageResult;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface IBaseService<T extends BaseModel> {
@@ -22,7 +23,7 @@ public interface IBaseService<T extends BaseModel> {
      *
      * @param models 数据
      */
-    void insertBatch(List<T> models);
+    void insertBatch(Collection<T> models);
 
     /**
      * 根据ID查询
@@ -30,14 +31,14 @@ public interface IBaseService<T extends BaseModel> {
      * @param id id
      * @return T
      */
-    T selectById(Long id);
+    T selectById(String id);
 
     /**
      * 根据id
      *
      * @param id id
      */
-    void deleteById(Long id);
+    void deleteById(String id);
 
     /**
      * 插入数据
@@ -62,7 +63,7 @@ public interface IBaseService<T extends BaseModel> {
      *
      * @param ids ids
      */
-    void deleteByIds(List<String> ids);
+    void deleteByIds(Collection<String> ids);
 
     /**
      * 根据条件删除
@@ -70,4 +71,18 @@ public interface IBaseService<T extends BaseModel> {
      * @param wrapper wrapper
      */
     void delete(UpdateWrapper<T> wrapper);
+
+    /**
+     * 更新数据
+     *
+     * @param model model
+     */
+    boolean updateById(T model);
+
+    /**
+     * 批量更新
+     *
+     * @param models models
+     */
+    void updateBatch(Collection<T> models);
 }

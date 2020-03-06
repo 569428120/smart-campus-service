@@ -19,6 +19,7 @@ public class BasicExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResult> handleException(Exception e) {
+        log.error("service error ", e);
         if (e instanceof SipException) {
             SipException sipException = (SipException) e;
             return ResponseEntity.status(sipException.getCode())

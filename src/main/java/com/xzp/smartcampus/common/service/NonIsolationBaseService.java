@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xzp.smartcampus.common.model.BaseModel;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 数据不隔离
@@ -49,7 +49,7 @@ public class NonIsolationBaseService<M extends BaseMapper<T>, T extends BaseMode
      * @param models models
      */
     @Override
-    protected void initTenant(List models) {
+    protected void initTenant(Collection models) {
 
     }
 

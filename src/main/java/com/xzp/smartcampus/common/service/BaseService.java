@@ -1,6 +1,5 @@
 package com.xzp.smartcampus.common.service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -11,10 +10,8 @@ import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.model.BaseModel;
 import com.xzp.smartcampus.common.vo.PageResult;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -54,7 +51,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      *
      * @param models models
      */
-    protected abstract void initTenant(List<T> models);
+    protected abstract void initTenant(Collection<T> models);
 
 
     @Override
@@ -64,7 +61,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
     }
 
     @Override
-    public void insertBatch(List<T> models) {
+    public void insertBatch(Collection<T> models) {
         if (models == null || models.isEmpty()) {
             return;
         }
@@ -80,7 +77,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @return T
      */
     @Override
-    public T selectById(Long id) {
+    public T selectById(String id) {
         return this.getById(id);
     }
 
@@ -90,8 +87,8 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @param id id
      */
     @Override
-    public void deleteById(Long id) {
-        this.deleteById(id);
+    public void deleteById(String id) {
+        baseMapper.deleteById(id);
     }
 
     /**
@@ -128,19 +125,42 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @param ids ids
      */
     @Override
-    public void deleteByIds(List<String> ids) {
+    public void deleteByIds(Collection<String> ids) {
         if (ids == null || ids.isEmpty()) {
             log.info("ids is null");
             return;
         }
-        this.removeByIds(ids);
+        baseMapper.deleteBatchIds(ids);
     }
 
     @Override
     public void delete(UpdateWrapper<T> wrapper) {
         this.initTenant(wrapper);
-        this.remove(wrapper);
+        baseMapper.delete(wrapper);
     }
 
+    /**
+     * 更新数据
+     *
+     * @param model model
+     * @return
+     */
+    @Override
+    public boolean updateById(T model) {
+        this.initTenant(model);
+        baseMapper.updateById(model);
+        return true;
+    }
+
+    /**
+     * 批量更新
+     *
+     * @param models models
+     */
+    @Override
+    public void updateBatch(Collection<T> models) {
+        this.initTenant(models);
+        this.updateBatchById(models);
+    }
 
 }
