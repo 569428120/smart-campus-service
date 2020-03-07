@@ -11,8 +11,8 @@ import lombok.EqualsAndHashCode;
 public class AccessStrategyModel extends BaseModel {
     // 策略名称
     private String strategyName;
-    // 状态>>>是否启用>>>0 禁用;1 启用
-    private int status;
+    // 状态
+    private String strategyStatus;
     // 描述信息
-    private String desc;
+    private String description;
 }

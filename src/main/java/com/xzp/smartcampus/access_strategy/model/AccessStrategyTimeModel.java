@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "tb_access_ser_strategy_time")
 public class AccessStrategyTimeModel extends BaseModel {
+    private String strategyId;
     //日期类型:节假日,工作日,无限期
     private String dateType;
     // 开始时间
