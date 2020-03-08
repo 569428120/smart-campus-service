@@ -8,8 +8,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.model.BaseModel;
+import com.xzp.smartcampus.common.utils.UserContext;
 import com.xzp.smartcampus.common.vo.PageResult;
+import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,36 +30,41 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
     /**
      * 设置数据隔离的参数
      *
-     * @param wrapper wrapper
+     * @param wrapper  wrapper
+     * @param userInfo userInfo
      */
-    protected abstract void initTenant(QueryWrapper wrapper);
+    protected abstract void initTenant(QueryWrapper wrapper, LoginUserInfo userInfo);
 
     /**
      * 设置数据隔离的参数
      *
-     * @param wrapper wrapper
+     * @param wrapper  wrapper
+     * @param userInfo userInfo
      */
-    protected abstract void initTenant(UpdateWrapper wrapper);
+    protected abstract void initTenant(UpdateWrapper wrapper, LoginUserInfo userInfo);
 
 
     /**
      * 设置数据隔离的参数
      *
-     * @param model model
+     * @param model    model
+     * @param userInfo userInfo
      */
-    protected abstract void initTenant(T model);
+    protected abstract void initTenant(T model, LoginUserInfo userInfo);
 
     /**
      * 设置数据隔离的参数
      *
-     * @param models models
+     * @param models   models
+     * @param userInfo userInfo
      */
-    protected abstract void initTenant(Collection<T> models);
+    protected abstract void initTenant(Collection<T> models, LoginUserInfo userInfo);
 
 
     @Override
     public List<T> selectList(QueryWrapper<T> wrapper) {
-        this.initTenant(wrapper);
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        this.initTenant(wrapper, userInfo);
         return this.list(wrapper);
     }
 
@@ -65,9 +73,9 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
         if (models == null || models.isEmpty()) {
             return;
         }
-        this.initTenant(models);
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        this.initTenant(models, userInfo);
         this.saveBatch(models);
-
     }
 
     /**
@@ -98,7 +106,8 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public void insert(T model) {
-        this.initTenant(model);
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        this.initTenant(model, userInfo);
         this.save(model);
     }
 
@@ -111,7 +120,8 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public PageResult<T> selectPage(Page<T> page, QueryWrapper<T> wrapper) {
-        this.initTenant(wrapper);
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        this.initTenant(wrapper, userInfo);
         IPage<T> iPage = this.baseMapper.selectPage(page, wrapper);
         if (iPage == null) {
             throw new SipException("selectPage error");
@@ -135,7 +145,8 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
 
     @Override
     public void delete(UpdateWrapper<T> wrapper) {
-        this.initTenant(wrapper);
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        this.initTenant(wrapper, userInfo);
         baseMapper.delete(wrapper);
     }
 
@@ -147,7 +158,8 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public boolean updateById(T model) {
-        this.initTenant(model);
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        this.initTenant(model, userInfo);
         baseMapper.updateById(model);
         return true;
     }
@@ -159,7 +171,8 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public void updateBatch(Collection<T> models) {
-        this.initTenant(models);
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        this.initTenant(models, userInfo);
         this.updateBatchById(models);
     }
 
