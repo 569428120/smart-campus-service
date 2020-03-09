@@ -1,9 +1,11 @@
 package com.xzp.smartcampus.access_strategy.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -17,4 +19,7 @@ public class AccessStrategyTimeModel extends BaseModel {
     // 结束时间
     private String endTime;
 
+    // 临时属性,标识该对象是新增/更新/删除
+    @TableField(exist = false)
+    private String action;
 }

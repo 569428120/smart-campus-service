@@ -1,6 +1,7 @@
 package com.xzp.smartcampus.access_strategy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xzp.smartcampus.access_strategy.mapper.AccessStrategyMapper;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyDetailModel;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyModel;
@@ -22,6 +23,7 @@ import java.util.*;
 
 @Service
 @Slf4j
+@Transactional(rollbackFor = SipException.class)
 public class AccessStrategyService extends IsolationBaseService<AccessStrategyMapper, AccessStrategyModel>
         implements IAccessStrategyService {
 
@@ -93,7 +95,6 @@ public class AccessStrategyService extends IsolationBaseService<AccessStrategyMa
      * @param strategyDetailModel  策略详细信息
      */
     @Override
-    @Transactional
     public void createAccessStrategy(AccessStrategyDetailModel strategyDetailModel){
         //1. 策略实体属性直接使用策略详情的属性拷贝
         AccessStrategyModel strategyModel=new AccessStrategyModel();
@@ -121,18 +122,35 @@ public class AccessStrategyService extends IsolationBaseService<AccessStrategyMa
             }
         });
         //3.将策略Model写入数据库
-        if (!CollectionUtils.isEmpty(strategyTimeModels)){  //如果策略时间Model为空则不记录该条策略
-            this.insert(strategyModel);
-            //4.待策略Model写入之后取得策略Model的Id
-            strategyTimeModels.forEach(time_model->{
-                time_model.setRegionId(strategyModel.getRegionId());
-                time_model.setSchoolId(strategyModel.getSchoolId());
-                time_model.setStrategyId(strategyModel.getId());
-            });
-            //5.策略-时间 Model写入数据库
-            log.info("Insert strategyTimeModels into database,the corresponding strategy-id is: "+strategyModel.getId());
-            this.strategyTimeService.insertBatch(strategyTimeModels);
+//        if (!CollectionUtils.isEmpty(strategyTimeModels)){  //如果策略时间Model为空则不记录该条策略>>>暂不做此限制
+        this.insert(strategyModel);
+        //4.待策略Model写入之后取得策略Model的Id
+        strategyTimeModels.forEach(time_model->{
+            time_model.setRegionId(strategyModel.getRegionId());
+            time_model.setSchoolId(strategyModel.getSchoolId());
+            time_model.setStrategyId(strategyModel.getId());
+        });
+        //5.策略-时间 Model写入数据库
+        log.info("Insert strategyTimeModels into database,the corresponding strategy-id is: "+strategyModel.getId());
+        this.strategyTimeService.insertBatch(strategyTimeModels);
+//        }
+    }
+
+    public void deleteStrategyById(String id) {
+        if(StringUtils.isEmpty(id)){
+            log.error("Id of strategy to be deleted is null or empty!");
+            throw new SipException("Id of strategy to be deleted is null or empty!");
         }
+        // 1.删除策略主表数据
+        this.deleteById(id);
+        log.info(MessageFormat.format("Strategy id:{0} has been deleted",id));
+        // 2.删除对应的 策略-时间段 数据
+        this.strategyTimeService.delete(new UpdateWrapper<AccessStrategyTimeModel>().like("strategy_id",id));
+        log.info(MessageFormat.format("Strategy-time-models that belongs strategy-id:{0} have been deleted",id));
+    }
+
+    public void modifyAccessStrategy(AccessStrategyModel strategyModel){
+        this.updateById(strategyModel);
     }
 
 
@@ -156,4 +174,16 @@ public class AccessStrategyService extends IsolationBaseService<AccessStrategyMa
 
 
 
+
+
+
+
+
 }
+
+
+
+
+
+
+
