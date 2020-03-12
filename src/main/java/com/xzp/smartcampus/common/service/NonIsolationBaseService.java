@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xzp.smartcampus.common.model.BaseModel;
+import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 
 import java.util.Collection;
 
@@ -13,53 +14,48 @@ import java.util.Collection;
  * @author Administrator
  */
 public class NonIsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> extends BaseService<M, T> implements IBaseService<T> {
+
     /**
      * 设置数据隔离的参数
      *
-     * @param wrapper wrapper
+     * @param wrapper  wrapper
+     * @param userInfo userInfo
      */
     @Override
-    protected void initTenant(QueryWrapper wrapper) {
+    protected void initTenant(QueryWrapper wrapper, LoginUserInfo userInfo) {
+        
+    }
+
+    /**
+     * 设置数据隔离的参数
+     *
+     * @param wrapper  wrapper
+     * @param userInfo userInfo
+     */
+    @Override
+    protected void initTenant(UpdateWrapper wrapper, LoginUserInfo userInfo) {
 
     }
 
     /**
      * 设置数据隔离的参数
      *
-     * @param wrapper wrapper
+     * @param model    model
+     * @param userInfo userInfo
      */
     @Override
-    protected void initTenant(UpdateWrapper wrapper) {
+    protected void initTenant(T model, LoginUserInfo userInfo) {
 
     }
 
     /**
      * 设置数据隔离的参数
      *
-     * @param model model
+     * @param models   models
+     * @param userInfo userInfo
      */
     @Override
-    protected void initTenant(BaseModel model) {
-
-    }
-
-    /**
-     * 设置数据隔离的参数
-     *
-     * @param models models
-     */
-    @Override
-    protected void initTenant(Collection models) {
-
-    }
-
-    /**
-     * 插入数据
-     *
-     * @param model 数据
-     */
-    @Override
-    public void insert(T model) {
+    protected void initTenant(Collection<T> models, LoginUserInfo userInfo) {
 
     }
 }
