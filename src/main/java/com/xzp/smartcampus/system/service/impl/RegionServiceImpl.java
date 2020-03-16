@@ -3,7 +3,7 @@ package com.xzp.smartcampus.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xzp.smartcampus.common.exception.SipException;
-import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.service.NonIsolationBaseService;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.mapper.RegionMapper;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(rollbackFor = Exception.class)
 @Slf4j
-public class RegionServiceImpl extends IsolationBaseService<RegionMapper, RegionModel> implements IRegionService {
+public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, RegionModel> implements IRegionService {
 
     /**
      * 分页查询教育局数据
