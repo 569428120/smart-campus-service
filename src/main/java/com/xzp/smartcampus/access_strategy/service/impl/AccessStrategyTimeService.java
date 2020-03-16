@@ -1,6 +1,6 @@
 package com.xzp.smartcampus.access_strategy.service.impl;
 
-import com.xzp.smartcampus.access_strategy.constconfig.StrategyConst;
+import com.xzp.smartcampus.access_strategy.constconfig.AccessConst;
 import com.xzp.smartcampus.access_strategy.mapper.AccessStrategyTimeMapper;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyTimeModel;
 import com.xzp.smartcampus.access_strategy.service.IAccessStrategyTimeService;
@@ -27,12 +27,12 @@ public class AccessStrategyTimeService extends IsolationBaseService<AccessStrate
         List<String> delTimeModelIds = new ArrayList<>();
         strategyTimeModels.forEach(timeModel -> {
 
-            if (timeModel.getAction().equals(StrategyConst.ADD)) {
+            if (timeModel.getAction().equals(AccessConst.ADD)) {
                 System.out.println(timeModel.getAction());
                 addTimeModels.add(timeModel);
-            } else if (timeModel.getAction().equals(StrategyConst.UPDATE)) {
+            } else if (timeModel.getAction().equals(AccessConst.UPDATE)) {
                 upTimeModels.add(timeModel);
-            } else if (timeModel.getAction().equals(StrategyConst.DELETE)) {
+            } else if (timeModel.getAction().equals(AccessConst.DELETE)) {
                 delTimeModelIds.add(timeModel.getId());
             }
         });
