@@ -176,4 +176,13 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
         this.updateBatchById(models);
     }
 
+    /**
+     * 根据id批量查询
+     *
+     * @param ids ids
+     */
+    @Override
+    public List<T> selectByIds(Collection<String> ids) {
+        return baseMapper.selectList(new QueryWrapper<T>().in("id", ids));
+    }
 }

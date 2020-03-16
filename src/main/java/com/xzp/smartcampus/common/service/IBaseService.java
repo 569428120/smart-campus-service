@@ -8,6 +8,7 @@ import com.xzp.smartcampus.common.vo.PageResult;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface IBaseService<T extends BaseModel> {
     /**
@@ -85,4 +86,11 @@ public interface IBaseService<T extends BaseModel> {
      * @param models models
      */
     void updateBatch(Collection<T> models);
+
+    /**
+     * 根据id批量查询
+     *
+     * @param ids ids
+     */
+    List<T> selectByIds(Collection<String> ids);
 }
