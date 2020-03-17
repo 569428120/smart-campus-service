@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(rollbackFor = Exception.class)
 @Slf4j
-public class PcMenuService extends BaseMenuService implements IPcMenuService {
+public class PcMenuServiceImpl extends BaseMenuService implements IPcMenuService {
     /**
      * 获取菜单类型
      *
