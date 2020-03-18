@@ -26,9 +26,12 @@ class PcMenuModal extends PureComponent {
    * @param onOk
    */
   onSubmit = (onOk) => {
-    const {form: {validateFields}, openType} = this.props;
+    const {form: {validateFields}, openType, pDataSource: {id}} = this.props;
     validateFields((errors, values) => {
       if (errors === null) {
+        if (openType === 'add' && id) {
+          values.pid = id;
+        }
         onOk && onOk(values, openType);
       }
     });
@@ -191,6 +194,8 @@ PcMenuModal.propTypes = {
   openType: PropTypes.string,
   // 回显的数据
   dataSource: PropTypes.object,
+  // 父节点数据
+  pDataSource: PropTypes.object,
   // 确认方法
   onOk: PropTypes.func,
   // 取消方法

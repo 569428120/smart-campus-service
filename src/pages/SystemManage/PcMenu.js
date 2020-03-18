@@ -80,11 +80,12 @@ class PcMenu extends PureComponent {
   /**
    *  新增
    */
-  openCreatePcMenuModal = (record, openType) => {
+  openCreatePcMenuModal = (record, openType, pRecord) => {
     this.setState({
       menuModalVisible: true,
       openType,
-      menuModel: record
+      menuModel: record,
+      pMenuModel: pRecord
     });
   };
 
@@ -144,13 +145,20 @@ class PcMenu extends PureComponent {
   getOperatorButtonProps = () => {
     const {selectedRowKeys, selectedRows} = this.state;
     const buttonList = [];
+    let addText = '新增一级菜单';
+    if ((selectedRowKeys || []).length === 1) {
+      addText = '新增子菜单';
+    }
+    if ((selectedRows || []).length === 1 && selectedRows[0].menuLevel === 3) {
+      addText = '新增操作';
+    }
     // 新增按钮
     buttonList.push({
       icon: 'plus',
       type: 'primary',
-      text: '新建',
+      text: addText,
       operatorKey: 'test-key',
-      onClick: () => this.openCreatePcMenuModal({}, 'add'),
+      onClick: () => this.openCreatePcMenuModal({}, 'add', (selectedRows || []).length === 1 ? selectedRows[0] : {}),
     });
     // 更新按钮，选择一个的时候显示
     if ((selectedRows || []).length === 1) {
@@ -207,6 +215,7 @@ class PcMenu extends PureComponent {
       visible: this.state.menuModalVisible,
       openType: this.state.openType,
       dataSource: this.state.menuModel,
+      pDataSource: this.state.pMenuModel,
       onOk: this.onPcMenuModalOk,
       onCancel: this.closePcMenuModal
     };
