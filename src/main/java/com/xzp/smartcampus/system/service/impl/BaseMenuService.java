@@ -43,8 +43,9 @@ public abstract class BaseMenuService extends IsolationBaseService<MenuMapper, M
                 .eq("app_type", this.getMenuType())
                 .like(StringUtils.isNotBlank(searchValue.getMenuName()), "menu_name", searchValue.getMenuName())
                 .like(StringUtils.isNotBlank(searchValue.getRoute()), "route", searchValue.getRoute())
-                .like(StringUtils.isNotBlank(searchValue.getOperateName()), "searchValue", searchValue.getOperateName())
+                .like(StringUtils.isNotBlank(searchValue.getOperateName()), "operate_name", searchValue.getOperateName())
                 .like(StringUtils.isNotBlank(searchValue.getOperateCode()), "operate_code", searchValue.getOperateCode())
+                .orderByDesc("create_time")
         );
         if (CollectionUtils.isEmpty(menuModels)) {
             return Collections.emptyList();

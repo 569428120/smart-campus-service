@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class MenuTreeVo extends MenuModel implements TreeVo<MenuTreeVo, MenuModel> {
 
-    private List<MenuTreeVo> child;
+    private List<MenuTreeVo> children;
 
 
     /**
@@ -20,8 +20,8 @@ public class MenuTreeVo extends MenuModel implements TreeVo<MenuTreeVo, MenuMode
      * @return List<TreeVo>
      */
     @Override
-    public List<MenuTreeVo> getChild() {
-        return child;
+    public List<MenuTreeVo> getChildren() {
+        return children;
     }
 
     /**
@@ -30,8 +30,8 @@ public class MenuTreeVo extends MenuModel implements TreeVo<MenuTreeVo, MenuMode
      * @param treeVos treeVos
      */
     @Override
-    public void setChild(List<MenuTreeVo> treeVos) {
-        this.child = treeVos;
+    public void setChildren(List<MenuTreeVo> treeVos) {
+        this.children = treeVos;
     }
 
     /**

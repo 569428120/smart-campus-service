@@ -28,14 +28,14 @@ public interface TreeVo<T extends TreeVo, M extends BaseModel> {
      *
      * @return List<TreeVo>
      */
-    List<T> getChild();
+    List<T> getChildren();
 
     /**
      * 设置子节点
      *
      * @param treeVos treeVos
      */
-    void setChild(List<T> treeVos);
+    void setChildren(List<T> treeVos);
 
     /**
      * model转vo

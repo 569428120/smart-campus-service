@@ -37,8 +37,8 @@ public class TreeUtil {
             treeVos.add(item);
         });
 
-        // 父节点不在映射中视为根节点
-        List<TreeVo> rootVos = vos.stream().filter(item -> !pidToVoListMap.containsKey(item.getId())).collect(Collectors.toList());
+        // root 节点或者空节点
+        List<TreeVo> rootVos = vos.stream().filter(item -> StringUtils.isBlank(item.getPid()) || Constant.ROOT.equals(item.getPid())).collect(Collectors.toList());
         // 组装成树
         assembleTree(rootVos, pidToVoListMap);
         return (List<T>) rootVos;
@@ -59,7 +59,7 @@ public class TreeUtil {
             if (CollectionUtils.isEmpty(child)) {
                 return;
             }
-            item.setChild(child);
+            item.setChildren(child);
             assembleTree(child, pidToVoListMap);
         });
     }
