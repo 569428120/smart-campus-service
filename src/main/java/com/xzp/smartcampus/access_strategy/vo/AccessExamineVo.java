@@ -16,4 +16,5 @@ public class AccessExamineVo extends BaseModel {
     private Integer isCar;
     private String carNumber;
     private String flowType;
+
 }
