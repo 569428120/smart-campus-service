@@ -18,4 +18,12 @@ public interface IAuthorityGroupService extends IBaseService<AuthorityGroupModel
      * @return PageResult
      */
     PageResult getAuthorityGroupPage(AuthorityGroupModel searchValue, Integer current, Integer pageSize);
+
+    /**
+     * 保存权限组数据
+     *
+     * @param groupModel 数据
+     * @return AuthorityGroupModel
+     */
+    AuthorityGroupModel saveAuthorityGroup(AuthorityGroupModel groupModel);
 }

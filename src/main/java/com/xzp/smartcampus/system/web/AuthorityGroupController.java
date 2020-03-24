@@ -5,10 +5,7 @@ import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.model.AuthorityGroupModel;
 import com.xzp.smartcampus.system.service.IAuthorityGroupService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -38,5 +35,14 @@ public class AuthorityGroupController {
         return ResponseEntity.ok(authorityGroupService.getAuthorityGroupPage(searchValue, current, pageSize));
     }
 
-
+    /**
+     * 保存数据
+     *
+     * @param groupModel groupModel
+     * @return ResponseEntity<AuthorityGroupModel>
+     */
+    @PostMapping("/posts")
+    public ResponseEntity<AuthorityGroupModel> saveAuthorityGroup(@RequestBody AuthorityGroupModel groupModel) {
+        return ResponseEntity.ok(authorityGroupService.saveAuthorityGroup(groupModel));
+    }
 }

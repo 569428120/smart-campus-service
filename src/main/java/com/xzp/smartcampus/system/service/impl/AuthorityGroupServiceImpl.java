@@ -2,7 +2,9 @@ package com.xzp.smartcampus.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.mapper.AuthorityGroupMapper;
 import com.xzp.smartcampus.system.mapper.RegionMapper;
@@ -33,5 +35,31 @@ public class AuthorityGroupServiceImpl extends IsolationBaseService<AuthorityGro
                 .like(StringUtils.isNotBlank(searchValue.getAuthorityName()), "authority_name", searchValue.getAuthorityName())
                 .like(StringUtils.isNotBlank(searchValue.getAuthorityCode()), "authority_code", searchValue.getAuthorityCode())
         );
+    }
+
+    /**
+     * 保存权限组数据
+     *
+     * @param groupModel 数据
+     * @return AuthorityGroupModel
+     */
+    @Override
+    public AuthorityGroupModel saveAuthorityGroup(AuthorityGroupModel groupModel) {
+        // 新增操作
+        if (StringUtils.isBlank(groupModel.getId())) {
+            groupModel.setId(SqlUtil.getUUId());
+            this.insert(groupModel);
+            return groupModel;
+        }
+        // 更新操作
+        AuthorityGroupModel localDbGroupModel = this.selectById(groupModel.getId());
+        if (localDbGroupModel == null) {
+            log.error("not find AuthorityGroupModel by id {}", groupModel.getId());
+            throw new SipException("数据错误，找不到AuthorityGroupModel id为 " + groupModel.getId());
+        }
+        localDbGroupModel.setAuthorityName(groupModel.getAuthorityName());
+        localDbGroupModel.setAuthorityCode(groupModel.getAuthorityCode());
+        localDbGroupModel.setDescription(groupModel.getDescription());
+        return localDbGroupModel;
     }
 }
