@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 
 /**
  * 权限组
@@ -44,5 +45,17 @@ public class AuthorityGroupController {
     @PostMapping("/posts")
     public ResponseEntity<AuthorityGroupModel> saveAuthorityGroup(@RequestBody AuthorityGroupModel groupModel) {
         return ResponseEntity.ok(authorityGroupService.saveAuthorityGroup(groupModel));
+    }
+
+    /**
+     * 删除数据
+     *
+     * @param menuIds menuIds
+     * @return ResponseEntity<String>
+     */
+    @GetMapping("/deletes/deletes-by-ids")
+    public ResponseEntity<String> deleteAuthorityGroupByIds(@RequestParam(value = "groupIds", defaultValue = "") String groupIds) {
+        authorityGroupService.deleteAuthorityGroupByIds(Arrays.asList(groupIds.split(",")));
+        return ResponseEntity.ok("删除成功");
     }
 }

@@ -4,6 +4,8 @@ import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.model.AuthorityGroupModel;
 
+import java.util.List;
+
 /**
  * 权限组
  */
@@ -26,4 +28,11 @@ public interface IAuthorityGroupService extends IBaseService<AuthorityGroupModel
      * @return AuthorityGroupModel
      */
     AuthorityGroupModel saveAuthorityGroup(AuthorityGroupModel groupModel);
+
+    /**
+     * 删除权限组数据
+     *
+     * @param groupIds groupIds
+     */
+    void deleteAuthorityGroupByIds(List<String> groupIds);
 }

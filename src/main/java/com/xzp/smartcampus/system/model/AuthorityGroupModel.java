@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "tb_sys_ser_menu")
+@TableName(value = "tb_sys_ser_authority")
 public class AuthorityGroupModel extends BaseModel {
 
     /**

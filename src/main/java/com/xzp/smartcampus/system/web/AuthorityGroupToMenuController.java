@@ -23,7 +23,7 @@ public class AuthorityGroupToMenuController {
      * @param groupId 权限组id
      * @return ResponseEntity<PageResult>
      */
-    @GetMapping("/authority-to-menu/gets/gets-by-groupid")
+    @GetMapping("/gets/gets-by-groupid")
     public ResponseEntity<List<MenuTreeVo>> getMenuListByGroupId(@RequestParam(value = "groupId") String groupId) {
         return ResponseEntity.ok(groupToMenuService.getMenuListByGroupId(groupId));
     }

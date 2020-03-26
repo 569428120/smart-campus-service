@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "tb_sys_ser_menu")
+@TableName(value = "tb_sys_ser_authority_to_menu")
 public class AuthorityGroupToMenuModel extends BaseModel {
     /**
      * 权限组id

@@ -2,6 +2,7 @@ package com.xzp.smartcampus.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.utils.TreeUtil;
 import com.xzp.smartcampus.system.mapper.AuthorityGroupToMenuMapper;
 import com.xzp.smartcampus.system.model.AuthorityGroupToMenuModel;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,20 +73,27 @@ public class AuthorityGroupToMenuServiceImpl extends IsolationBaseService<Author
         // 筛选出那些需要新增，那些需要删除，无需更新
         List<AuthorityGroupToMenuModel> groupToMenuModels = this.selectList(new QueryWrapper<AuthorityGroupToMenuModel>()
                 .eq("group_id", groupId)
-                .in("menu_id", menuIds)
         );
         List<String> localDbMenuIds = groupToMenuModels.stream().map(AuthorityGroupToMenuModel::getMenuId).collect(Collectors.toList());
-        List<String> insertIds = new ArrayList<>();
-        List<String> deleteIds = new ArrayList<>();
-        groupToMenuModels.forEach(item -> {
-            // 本地存在，传入的参数没有为删除
-            if (localDbMenuIds.contains(item.getMenuId()) && !menuIds.contains(item.getMenuId())) {
+        // 本地不存在，传入有，为新增
+        List<AuthorityGroupToMenuModel> insertModels = menuIds.stream().filter(menuId -> StringUtils.isNotBlank(menuId) && !localDbMenuIds.contains(menuId)).map(menuId -> {
+            AuthorityGroupToMenuModel groupToMenuModel = new AuthorityGroupToMenuModel();
+            groupToMenuModel.setId(SqlUtil.getUUId());
+            groupToMenuModel.setGroupId(groupId);
+            groupToMenuModel.setMenuId(menuId);
+            return groupToMenuModel;
+        }).collect(Collectors.toList());
+        // 本地存在，传入的参数没有为删除
+        List<String> deleteIds = groupToMenuModels.stream()
+                .filter(item -> !menuIds.contains(item.getMenuId()))
+                .map(AuthorityGroupToMenuModel::getId).collect(Collectors.toList());
 
-            }
-            // 本地不存在，传入有，为新增
-            // 例外情况，报错处理
-
-        });
+        if (!CollectionUtils.isEmpty(insertModels)) {
+            this.insertBatch(insertModels);
+        }
+        if (!CollectionUtils.isEmpty(deleteIds)) {
+            this.deleteByIds(deleteIds);
+        }
     }
 
 
