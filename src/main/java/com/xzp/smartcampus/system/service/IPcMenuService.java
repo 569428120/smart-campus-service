@@ -2,6 +2,7 @@ package com.xzp.smartcampus.system.service;
 
 import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.system.model.MenuModel;
+import com.xzp.smartcampus.system.vo.MenuTreeVo;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface IPcMenuService extends IBaseService<MenuModel> {
      * @param searchValue searchValue
      * @return List<MenuModel>
      */
-    List<MenuModel> getMenuList(MenuModel searchValue);
+    List<MenuTreeVo> getMenuList(MenuModel searchValue);
 
     /**
      * 报错

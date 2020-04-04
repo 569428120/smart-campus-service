@@ -1,5 +1,7 @@
 package com.xzp.smartcampus.system.model;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
@@ -33,7 +35,7 @@ public class MenuModel extends BaseModel {
     /**
      * 菜单级别
      */
-    private String menuLevel;
+    private Integer menuLevel;
 
     /**
      * 路由
@@ -53,5 +55,6 @@ public class MenuModel extends BaseModel {
     /**
      * 描述
      */
+    @TableField(strategy = FieldStrategy.IGNORED)
     private String description;
 }

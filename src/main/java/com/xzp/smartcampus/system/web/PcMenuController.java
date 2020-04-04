@@ -3,6 +3,7 @@ package com.xzp.smartcampus.system.web;
 import com.xzp.smartcampus.system.model.MenuModel;
 import com.xzp.smartcampus.system.model.SchoolModel;
 import com.xzp.smartcampus.system.service.IPcMenuService;
+import com.xzp.smartcampus.system.vo.MenuTreeVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class PcMenuController {
      * @return ResponseEntity<List < MenuModel>>
      */
     @GetMapping("/gets/all")
-    public ResponseEntity<List<MenuModel>> getPcMenuList(MenuModel searchValue) {
+    public ResponseEntity<List<MenuTreeVo>> getPcMenuList(MenuModel searchValue) {
         return ResponseEntity.ok(pcMenuService.getMenuList(searchValue));
     }
 
