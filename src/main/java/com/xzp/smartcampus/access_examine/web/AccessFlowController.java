@@ -1,10 +1,10 @@
-package com.xzp.smartcampus.access_strategy.web;
+package com.xzp.smartcampus.access_examine.web;
 
-import com.xzp.smartcampus.access_strategy.service.IAccessFlowService;
-import com.xzp.smartcampus.access_strategy.vo.AccessExamineVo;
-import com.xzp.smartcampus.access_strategy.vo.ExamineFlowParam;
-import com.xzp.smartcampus.access_strategy.vo.ExamineSearchParam;
-import com.xzp.smartcampus.access_strategy.vo.ExamineSearchResult;
+import com.xzp.smartcampus.access_examine.service.IAccessFlowService;
+import com.xzp.smartcampus.access_examine.vo.AccessExamineVo;
+import com.xzp.smartcampus.access_examine.vo.ExamineFlowParam;
+import com.xzp.smartcampus.access_examine.vo.ExamineSearchParam;
+import com.xzp.smartcampus.access_examine.vo.ExamineSearchResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;

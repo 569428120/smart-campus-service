@@ -1,4 +1,4 @@
-package com.xzp.smartcampus.access_strategy.model;
+package com.xzp.smartcampus.access_examine.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;

@@ -2,6 +2,7 @@ package com.xzp.smartcampus.access_strategy.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xzp.smartcampus.access_strategy.mapper.AccessStrategyMapper;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyDetailModel;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyModel;
@@ -10,6 +11,7 @@ import com.xzp.smartcampus.access_strategy.service.IAccessStrategyService;
 import com.xzp.smartcampus.access_strategy.service.IAccessStrategyTimeService;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.vo.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -39,19 +41,13 @@ public class AccessStrategyService extends IsolationBaseService<AccessStrategyMa
     public List<AccessStrategyDetailModel> findStrategyByCondition(String name, String status) {
         List<AccessStrategyModel> strategyModels = new ArrayList<>();
         //条件为空时,查找所有记录;否则按条件查找
+        PageResult<AccessStrategyModel> strategyModePageResult;
         QueryWrapper<AccessStrategyModel> wrapper = new QueryWrapper<>();
-        if (StringUtils.isEmpty(name) && StringUtils.isEmpty(status)) {
-            log.info("Searching condition is null,try to find all the strategy");
-            strategyModels = this.selectList(null);
-        } else {
-            if (!StringUtils.isEmpty(name)) {
-                wrapper.like("strategy_name", name);
-            }
-            if (!StringUtils.isEmpty(status)) {
-                wrapper.like("strategy_status", status);
-            }
-            strategyModels = this.selectList(wrapper);
-        }
+
+        wrapper.like(StringUtils.isNotEmpty(name),"strategy_name", name)
+                .like(StringUtils.isNotEmpty(status),"strategy_status", status);
+        strategyModels = this.selectList(wrapper);
+
         // 组装策略详细信息
         List<AccessStrategyDetailModel> strategyDetailModels = new ArrayList<>();
         AccessStrategyDetailModel detailModel = new AccessStrategyDetailModel();

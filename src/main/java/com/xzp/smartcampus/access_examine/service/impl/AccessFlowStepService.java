@@ -1,8 +1,8 @@
-package com.xzp.smartcampus.access_strategy.service.impl;
+package com.xzp.smartcampus.access_examine.service.impl;
 
-import com.xzp.smartcampus.access_strategy.mapper.AccessFlowStepMapper;
-import com.xzp.smartcampus.access_strategy.model.AccessFlowStepModel;
-import com.xzp.smartcampus.access_strategy.service.IAccessFlowStepService;
+import com.xzp.smartcampus.access_examine.mapper.AccessFlowStepMapper;
+import com.xzp.smartcampus.access_examine.model.AccessFlowStepModel;
+import com.xzp.smartcampus.access_examine.service.IAccessFlowStepService;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
 import org.springframework.stereotype.Service;

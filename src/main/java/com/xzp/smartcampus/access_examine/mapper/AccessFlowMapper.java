@@ -1,7 +1,7 @@
-package com.xzp.smartcampus.access_strategy.mapper;
+package com.xzp.smartcampus.access_examine.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.xzp.smartcampus.access_strategy.model.AccessFlowModel;
+import com.xzp.smartcampus.access_examine.model.AccessFlowModel;
 import org.springframework.stereotype.Repository;
 
 @Repository

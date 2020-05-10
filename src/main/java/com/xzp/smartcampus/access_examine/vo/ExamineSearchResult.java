@@ -1,4 +1,4 @@
-package com.xzp.smartcampus.access_strategy.vo;
+package com.xzp.smartcampus.access_examine.vo;
 
 import lombok.Data;
 

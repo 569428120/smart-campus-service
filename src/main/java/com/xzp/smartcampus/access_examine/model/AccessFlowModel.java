@@ -1,20 +1,17 @@
-package com.xzp.smartcampus.access_strategy.vo;
+package com.xzp.smartcampus.access_examine.model;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AccessExamineVo extends BaseModel {
-    private String originatorId;
-    private String applicantId;
-    private String examineId;
+@TableName(value = "tb_guard_ser_flow")
+public class AccessFlowModel extends BaseModel {
+    private String flowId;
     private String startTime;
     private String endTime;
-    private String reason;
     private Integer isCar;
     private String carNumber;
-    private String flowType;
-
 }

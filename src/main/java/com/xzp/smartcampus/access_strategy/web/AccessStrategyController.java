@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @Controller
-@RequestMapping("/access-strategy")
+@RequestMapping("/access-control")
 public class AccessStrategyController {
     @Resource
     private IAccessStrategyService strategyService;
@@ -23,10 +23,12 @@ public class AccessStrategyController {
      * @param status
      * @return
      */
-    @GetMapping("/gets/search")
+    @GetMapping("/access-strategy/gets/page")
     public ResponseEntity<List<AccessStrategyDetailModel>> selectStrategyByCondition(
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "status", required = false) String status
+//            @RequestParam(value = "current",defaultValue = "1") Integer current,
+//            @RequestParam(value = "pageSize",defaultValue = "15") Integer pageSize
     ) {
         List<AccessStrategyDetailModel> strategyDetailModels = this.strategyService.findStrategyByCondition(name, status);
 

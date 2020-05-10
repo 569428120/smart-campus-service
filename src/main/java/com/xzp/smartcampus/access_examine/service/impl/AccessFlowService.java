@@ -1,18 +1,19 @@
-package com.xzp.smartcampus.access_strategy.service.impl;
+package com.xzp.smartcampus.access_examine.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xzp.smartcampus.access_strategy.constconfig.AccessConst;
-import com.xzp.smartcampus.access_strategy.mapper.AccessFlowMapper;
-import com.xzp.smartcampus.access_strategy.model.AccessFlowModel;
-import com.xzp.smartcampus.access_strategy.model.AccessFlowPoolModel;
-import com.xzp.smartcampus.access_strategy.model.AccessFlowStepModel;
-import com.xzp.smartcampus.access_strategy.service.IAccessFlowPoolService;
-import com.xzp.smartcampus.access_strategy.service.IAccessFlowService;
-import com.xzp.smartcampus.access_strategy.service.IAccessFlowStepService;
-import com.xzp.smartcampus.access_strategy.vo.AccessExamineVo;
-import com.xzp.smartcampus.access_strategy.vo.ExamineFlowParam;
-import com.xzp.smartcampus.access_strategy.vo.ExamineSearchParam;
-import com.xzp.smartcampus.access_strategy.vo.ExamineSearchResult;
+import com.xzp.smartcampus.access_examine.constconfig.FLowConst;
+import com.xzp.smartcampus.access_examine.mapper.AccessFlowMapper;
+import com.xzp.smartcampus.access_examine.model.AccessFlowModel;
+import com.xzp.smartcampus.access_examine.model.AccessFlowPoolModel;
+import com.xzp.smartcampus.access_examine.model.AccessFlowStepModel;
+import com.xzp.smartcampus.access_examine.service.IAccessFlowPoolService;
+import com.xzp.smartcampus.access_examine.service.IAccessFlowService;
+import com.xzp.smartcampus.access_examine.service.IAccessFlowStepService;
+import com.xzp.smartcampus.access_examine.vo.AccessExamineVo;
+import com.xzp.smartcampus.access_examine.vo.ExamineFlowParam;
+import com.xzp.smartcampus.access_examine.vo.ExamineSearchParam;
+import com.xzp.smartcampus.access_examine.vo.ExamineSearchResult;
+import com.xzp.smartcampus.access_examine.vo.FullExamineFlowInfo;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.model.BaseModel;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
@@ -80,20 +81,20 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
         AccessFlowStepModel flowStepModel_1 = new AccessFlowStepModel();
         //拷贝BaseModel属性
         BeanUtils.copyProperties(base, flowStepModel_1);
-        flowStepModel_1.setStepName(AccessConst.APPLY);     //第一步骤创建完成,默认名称为 申请
+        flowStepModel_1.setStepName(FLowConst.APPLY);     //第一步骤创建完成,默认名称为 申请
         flowStepModel_1.setOpinion(examineVo.getReason());
         flowStepModel_1.setHandleId(applicant.getId());
         flowStepModel_1.setHandleType(applicant.getType());
         flowStepModel_1.setHandleName(applicant.getName());
         flowStepModel_1.setHandleCode(applicant.getCode());
         // 申请步骤创建完成,设置申请状态为完成
-        flowStepModel_1.setHandleStatus(AccessConst.PENDING);
+        flowStepModel_1.setHandleStatus(FLowConst.PENDING);
         // TODO 3.2 步骤2>>>审批
         SmartUser examine = this.userService.selectById(examineVo.getExamineId());
         AccessFlowStepModel flowStepModel_2 = new AccessFlowStepModel();
         //拷贝BaseModel属性
         BeanUtils.copyProperties(base, flowStepModel_2);
-        flowStepModel_2.setStepName(AccessConst.EXAMINE);
+        flowStepModel_2.setStepName(FLowConst.EXAMINE);
         flowStepModel_2.setHandleId(examine.getId());
         flowStepModel_2.setHandleType(examine.getType());
         flowStepModel_2.setHandleName(examine.getName());
@@ -148,7 +149,7 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
                 .like(StringUtils.isNotBlank(searchParam.getApplicantCode()), "applicant_code", searchParam.getApplicantCode());
         // 查询时过滤申请中的电子流
         if (StringUtils.isBlank(searchParam.getApplicantCode())) {
-            poolWrapper.ne("examine_status", AccessConst.APPLYING);
+            poolWrapper.ne("examine_status", FLowConst.APPLYING);
         } else {
             poolWrapper.eq("examine_status", searchParam.getHandleStatus());
         }
@@ -208,11 +209,11 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
             AccessFlowStepModel step1Model = this.stepService.selectById(steps[0]);
             AccessFlowStepModel step2Model = this.stepService.selectById(steps[1]);
             // 更新步骤状态,flow-pool状态
-            step1Model.setHandleStatus(AccessConst.FINISH);
-            step2Model.setHandleStatus(AccessConst.PENDING);
+            step1Model.setHandleStatus(FLowConst.FINISH);
+            step2Model.setHandleStatus(FLowConst.PENDING);
             this.stepService.updateBatch(Arrays.asList(step1Model, step2Model));
 
-            poolModel.setExamineStatus(AccessConst.PROCESSING);
+            poolModel.setExamineStatus(FLowConst.PROCESSING);
             this.poolService.updateById(poolModel);
         }
 
@@ -237,11 +238,11 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
         AccessFlowPoolModel poolModel = new AccessFlowPoolModel();
         poolModel.setId(flowId);
         switch (param.getStatus()) {
-            case AccessConst.CANCEL:
-                poolModel.setExamineStatus(AccessConst.CANCEL); // 取消(打回)
+            case FLowConst.CANCEL:
+                poolModel.setExamineStatus(FLowConst.CANCEL); // 取消(打回)
                 break;
-            case AccessConst.FINISH:
-                poolModel.setExamineStatus(AccessConst.FINISH); // 通过
+            case FLowConst.FINISH:
+                poolModel.setExamineStatus(FLowConst.FINISH); // 通过
                 break;
             default:
                 poolModel.setExamineStatus(param.getStatus());
@@ -258,6 +259,42 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
         this.poolService.updateById(poolModel);
         this.updateById(flowModel);
     }
+
+    public FullExamineFlowInfo selectExamineInfoById(String id){
+        if (StringUtils.isEmpty(id)) {
+            log.error("Examine service id is null!");
+            throw new SipException("Examine service id is null!");
+        }
+        // 1.根据业务id查询对应的业务信息
+        FullExamineFlowInfo fullExamineInfo;
+        AccessFlowModel flowModel=this.selectById(id);
+        if(null==flowModel){
+            return null;
+        }else {
+            fullExamineInfo=new FullExamineFlowInfo();
+            BeanUtils.copyProperties(flowModel,fullExamineInfo);
+            // 2.查询当前业务对应的流程对象
+            AccessFlowPoolModel poolModel=this.poolService.selectById(fullExamineInfo.getFlowId());
+            // 3.查询流程对应的审批步骤信息
+            fullExamineInfo.setPoolModel(poolModel);
+            if(null!=poolModel){
+                List<String> stepIds=Arrays.asList(poolModel.getSteps().split("##"));
+                List<AccessFlowStepModel> stepModels=this.stepService.selectByIds(stepIds);
+                fullExamineInfo.setSteps(stepModels);
+            }
+        }
+
+        return fullExamineInfo;
+    }
+
+
+
+
+
+
+
+
+
 
 
 }

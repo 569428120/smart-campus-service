@@ -1,9 +1,9 @@
-package com.xzp.smartcampus.access_strategy.service.impl;
+package com.xzp.smartcampus.access_examine.service.impl;
 
-import com.xzp.smartcampus.access_strategy.model.AccessFlowModel;
-import com.xzp.smartcampus.access_strategy.model.AccessFlowPoolModel;
-import com.xzp.smartcampus.access_strategy.model.AccessFlowStepModel;
-import com.xzp.smartcampus.access_strategy.vo.ExamineSearchResult;
+import com.xzp.smartcampus.access_examine.model.AccessFlowModel;
+import com.xzp.smartcampus.access_examine.model.AccessFlowPoolModel;
+import com.xzp.smartcampus.access_examine.model.AccessFlowStepModel;
+import com.xzp.smartcampus.access_examine.vo.ExamineSearchResult;
 import com.xzp.smartcampus.system.service.IRegionService;
 import com.xzp.smartcampus.system.service.ISchoolService;
 import org.springframework.beans.factory.annotation.Autowired;
