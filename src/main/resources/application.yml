@@ -6,9 +6,12 @@ spring:
     name: smartcampus-service
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://106.13.204.18:5432/db_smart_campus
-    username: scs_user
-    password: scs_user
+    # url: jdbc:postgresql://106.13.204.18:5432/db_smart_campus
+    url: jdbc:postgresql://101.200.242.67:5432/db_smart_campus
+    # username: scs_user
+    # password: scs_user
+    username: scs_db_user
+    password: xzp@7410
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/*Mapper.xml

@@ -91,7 +91,7 @@ public abstract class BaseMenuService extends IsolationBaseService<MenuMapper, M
             return menuModel;
         }
         this.updateMenuModel(menuModel);
-        return null;
+        return menuModel;
     }
 
     /**
