@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.StaffModel;
-import com.xzp.smartcampus.human.service.StaffService;
+import com.xzp.smartcampus.human.service.IStaffUserService;
 
 
 @RestController
@@ -16,7 +16,7 @@ import com.xzp.smartcampus.human.service.StaffService;
 public class StaffController {
 
     @Resource
-    private StaffService staffService;
+    private IStaffUserService staffService;
 
     /* ********************** 单个员工的CRUD ********************** */
 

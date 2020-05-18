@@ -5,7 +5,7 @@ import com.xzp.smartcampus.common.service.IsolationBaseService;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.human.mapper.StaffGroupMapper;
 import com.xzp.smartcampus.human.model.StaffGroupModel;
-import com.xzp.smartcampus.human.service.StaffGroupService;
+import com.xzp.smartcampus.human.service.IStaffGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class StaffGroupServiceImpl
         extends IsolationBaseService<StaffGroupMapper, StaffGroupModel>
-        implements StaffGroupService {
+        implements IStaffGroupService {
 
     @Override
     /* 新增一个组的信息，需要信息判断，不能直接 Insert */

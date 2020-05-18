@@ -16,6 +16,7 @@ import com.xzp.smartcampus.system.service.IAuthorityGroupService;
 import com.xzp.smartcampus.system.service.IAuthorityGroupToMenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -90,5 +91,37 @@ public class AuthorityGroupServiceImpl extends IsolationBaseService<AuthorityGro
                 .in("group_id", groupIds)
         );
         this.deleteByIds(groupIds);
+    }
+
+    /**
+     * 权限模板
+     *
+     * @param authorityTemplateId authorityTemplateId
+     */
+    @Override
+    public AuthorityGroupModel copyAuthorityGroupTemplate(String authorityTemplateId) {
+        if (StringUtils.isBlank(authorityTemplateId)) {
+            log.warn("authorityTemplateId is null");
+            throw new SipException("参数错误，authorityTemplateId 为空");
+        }
+        AuthorityGroupModel groupModel = this.selectById(authorityTemplateId);
+        if (groupModel == null) {
+            log.warn("not AuthorityGroupModel by id {}", authorityTemplateId);
+            throw new SipException("参数错误，找不到AuthorityGroupModel authorityTemplateId为" + authorityTemplateId);
+        }
+        List<AuthorityGroupToMenuModel> menuModels = groupToMenuService.selectList(new QueryWrapper<AuthorityGroupToMenuModel>()
+                .eq("group_id", groupModel.getId())
+        );
+        // 复制数据
+        groupModel.setId(SqlUtil.getUUId());
+        this.insert(groupModel);
+        if (!CollectionUtils.isEmpty(menuModels)) {
+            menuModels.forEach(item -> {
+                item.setId(SqlUtil.getUUId());
+                item.setGroupId(groupModel.getId());
+            });
+            groupToMenuService.insertBatch(menuModels);
+        }
+        return groupModel;
     }
 }

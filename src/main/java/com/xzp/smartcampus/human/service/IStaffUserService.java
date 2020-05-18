@@ -8,7 +8,7 @@ import com.xzp.smartcampus.human.model.StaffModel;
 /**
  * 员工信息系统
  */
-public interface StaffService extends IBaseService<StaffModel> {
+public interface IStaffUserService extends IBaseService<StaffModel> {
     /* 新增一个学生的信息，需要信息判断，不能直接 Insert */
     public StaffModel addStaff(StaffModel staff);
 

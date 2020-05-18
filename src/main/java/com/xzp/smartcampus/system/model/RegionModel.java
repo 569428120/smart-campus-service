@@ -19,6 +19,16 @@ public class RegionModel extends BaseModel {
     private String pid;
 
     /**
+     * 权限模板id
+     */
+    private String authorityTemplateId;
+
+    /**
+     * 管理员id
+     */
+    private String adminUserId;
+
+    /**
      * tree_path
      */
     private String treePath;

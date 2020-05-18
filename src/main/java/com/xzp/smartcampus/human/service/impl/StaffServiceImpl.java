@@ -8,7 +8,7 @@ import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.mapper.StaffMapper;
 import com.xzp.smartcampus.human.model.StaffModel;
-import com.xzp.smartcampus.human.service.StaffService;
+import com.xzp.smartcampus.human.service.IStaffUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class StaffServiceImpl
         extends IsolationBaseService<StaffMapper, StaffModel>
-        implements StaffService {
+        implements IStaffUserService {
 
     /*新增一个员工信息。id 不能重复。*/
     @Override

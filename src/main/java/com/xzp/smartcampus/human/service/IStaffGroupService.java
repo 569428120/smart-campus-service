@@ -7,7 +7,7 @@ import com.xzp.smartcampus.human.model.StaffGroupModel;
 /**
  * 学生信息系统
  */
-public interface StaffGroupService extends IBaseService<StaffGroupModel> {
+public interface IStaffGroupService extends IBaseService<StaffGroupModel> {
     /* 新增一个组的信息，需要信息判断，不能直接 Insert */
     public StaffGroupModel addStaffGroup(StaffGroupModel StaffGroup);
 

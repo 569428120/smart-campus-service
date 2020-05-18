@@ -1,7 +1,7 @@
 package com.xzp.smartcampus.human.web;
 
 import com.xzp.smartcampus.human.model.StaffGroupModel;
-import com.xzp.smartcampus.human.service.StaffGroupService;
+import com.xzp.smartcampus.human.service.IStaffGroupService;
 import com.xzp.smartcampus.human.service.StaffToGroupService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.List;
 public class StaffGroupController {
 
     @Resource
-    private StaffGroupService groupService;
+    private IStaffGroupService groupService;
     @Resource
     private StaffToGroupService groupMenberService;
 

@@ -7,8 +7,8 @@ import com.xzp.smartcampus.human.mapper.StaffToGroupMapper;
 import com.xzp.smartcampus.human.model.StaffGroupModel;
 import com.xzp.smartcampus.human.model.StaffModel;
 import com.xzp.smartcampus.human.model.StaffToGroupModel;
-import com.xzp.smartcampus.human.service.StaffGroupService;
-import com.xzp.smartcampus.human.service.StaffService;
+import com.xzp.smartcampus.human.service.IStaffGroupService;
+import com.xzp.smartcampus.human.service.IStaffUserService;
 import com.xzp.smartcampus.human.service.StaffToGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,9 +29,9 @@ public class StaffToGroupServiceImpl
         implements StaffToGroupService {
 
     @Resource
-    private StaffService StaffService;
+    private IStaffUserService StaffService;
     @Resource
-    private StaffGroupService groupService;
+    private IStaffGroupService groupService;
 
     /**
      * 组 增加一个成员：检查成员/组的合法性、是否与原数据冲突，然后插入
