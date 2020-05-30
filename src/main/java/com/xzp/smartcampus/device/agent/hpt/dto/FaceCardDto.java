@@ -22,5 +22,5 @@ public class FaceCardDto {
     /**
      * 数据信息
      */
-    private Map<String, Object> info = new HashMap<>();
+    private Map<String, Object> info;
 }

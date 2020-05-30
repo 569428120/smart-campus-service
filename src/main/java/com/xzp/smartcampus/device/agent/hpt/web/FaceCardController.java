@@ -5,10 +5,9 @@ import com.xzp.smartcampus.device.agent.hpt.dto.FaceCardDto;
 import com.xzp.smartcampus.device.agent.hpt.dto.ResultVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 提供给设备回调使用的接口
@@ -53,5 +52,12 @@ public class FaceCardController {
         log.info(JsonUtils.toString(postDto));
         return ResponseEntity.ok(ResultVo.ok());
     }
+
+    @GetMapping("/gets/heart-beat")
+    public ResponseEntity<ResultVo> test(HttpServletRequest request) {
+        log.info("{}",request.getParameterMap());
+        return ResponseEntity.ok(ResultVo.ok());
+    }
+
 
 }
