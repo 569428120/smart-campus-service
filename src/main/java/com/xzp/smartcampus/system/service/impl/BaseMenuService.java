@@ -1,6 +1,7 @@
 package com.xzp.smartcampus.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
 import com.xzp.smartcampus.common.utils.Constant;
@@ -43,8 +44,8 @@ public abstract class BaseMenuService extends IsolationBaseService<MenuMapper, M
                 .eq("app_type", this.getMenuType())
                 .like(StringUtils.isNotBlank(searchValue.getMenuName()), "menu_name", searchValue.getMenuName())
                 .like(StringUtils.isNotBlank(searchValue.getRoute()), "route", searchValue.getRoute())
-                .like(StringUtils.isNotBlank(searchValue.getOperateName()), "operate_name", searchValue.getOperateName())
-                .like(StringUtils.isNotBlank(searchValue.getOperateCode()), "operate_code", searchValue.getOperateCode())
+                .like(StringUtils.isNotBlank(searchValue.getMenuName()), "operate_name", searchValue.getMenuName())
+                .like(StringUtils.isNotBlank(searchValue.getRoute()), "operate_code", searchValue.getRoute())
                 .orderByDesc("create_time")
         );
         if (CollectionUtils.isEmpty(menuModels)) {
@@ -140,5 +141,23 @@ public abstract class BaseMenuService extends IsolationBaseService<MenuMapper, M
             menuModel.setMenuLevel(1);
         }
         this.insert(menuModel);
+    }
+
+    /**
+     * 删除菜单
+     *
+     * @param ids ids
+     */
+    public void deleteSchoolByIds(List<String> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            log.warn("ids is null");
+            return;
+        }
+        UpdateWrapper<MenuModel> wrapper = new UpdateWrapper<>();
+        for (String id : ids) {
+            wrapper.or();
+            wrapper.like("tree_path", id);
+        }
+        this.delete(wrapper);
     }
 }

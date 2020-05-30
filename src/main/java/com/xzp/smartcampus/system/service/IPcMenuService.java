@@ -23,4 +23,11 @@ public interface IPcMenuService extends IBaseService<MenuModel> {
      * @return MenuModel
      */
     MenuModel saveMenuData(MenuModel menuModel);
+
+    /**
+     * 删除菜单
+     *
+     * @param ids ids
+     */
+    void deleteSchoolByIds(List<String> ids);
 }

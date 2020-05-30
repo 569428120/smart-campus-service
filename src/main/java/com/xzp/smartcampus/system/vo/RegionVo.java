@@ -17,4 +17,9 @@ public class RegionVo extends RegionModel {
      * 登录密码
      */
     private String password;
+
+    /**
+     * 手机号码
+     */
+    private String contact;
 }

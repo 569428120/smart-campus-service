@@ -40,7 +40,7 @@ public class PcMenuController {
      */
     @GetMapping("/deletes/deletes-by-ids")
     public ResponseEntity<String> deleteSchoolByIds(@RequestParam(value = "menuIds", defaultValue = "") String menuIds) {
-        pcMenuService.deleteByIds(Arrays.asList(menuIds.split(",")));
+        pcMenuService.deleteSchoolByIds(Arrays.asList(menuIds.split(",")));
         return ResponseEntity.ok("删除成功");
     }
 

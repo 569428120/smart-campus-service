@@ -39,7 +39,9 @@ public interface IAuthorityGroupService extends IBaseService<AuthorityGroupModel
     /**
      * 权限模板
      *
-     * @param authorityTemplateId authorityTemplateId
+     * @param authorityTemplateId templateId
+     * @param regionId            regionId
+     * @param schoolId            schoolId
      */
-    AuthorityGroupModel copyAuthorityGroupTemplate(String authorityTemplateId);
+    AuthorityGroupModel copyAuthorityGroupTemplate(String authorityTemplateId, String regionId, String schoolId);
 }

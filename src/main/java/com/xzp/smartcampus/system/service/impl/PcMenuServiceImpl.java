@@ -25,4 +25,5 @@ public class PcMenuServiceImpl extends BaseMenuService implements IPcMenuService
         return MenuType.PC_MENU.getKey();
     }
 
+
 }

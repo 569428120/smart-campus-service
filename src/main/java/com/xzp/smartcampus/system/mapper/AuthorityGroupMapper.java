@@ -5,5 +5,5 @@ import com.xzp.smartcampus.system.model.AuthorityGroupModel;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AuthorityGroupMapper  extends BaseMapper<AuthorityGroupModel> {
+public interface AuthorityGroupMapper extends BaseMapper<AuthorityGroupModel> {
 }

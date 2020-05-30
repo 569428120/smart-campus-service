@@ -19,8 +19,10 @@ public class FaceCardDto {
      */
     private Integer code;
 
+    private String SanpPic;
+
     /**
      * 数据信息
      */
-    private Map<String, Object> info;
+    private Map<String, Object> info = new HashMap<>();
 }

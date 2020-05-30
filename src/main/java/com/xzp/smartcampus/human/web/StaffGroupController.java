@@ -2,7 +2,7 @@ package com.xzp.smartcampus.human.web;
 
 import com.xzp.smartcampus.human.model.StaffGroupModel;
 import com.xzp.smartcampus.human.service.IStaffGroupService;
-import com.xzp.smartcampus.human.service.StaffToGroupService;
+import com.xzp.smartcampus.human.vo.UserGroupTreeVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,68 +16,81 @@ public class StaffGroupController {
 
     @Resource
     private IStaffGroupService groupService;
-    @Resource
-    private StaffToGroupService groupMenberService;
 
-    /* 组级别的操作 */
-    //按照学生号，获取一个组的信息
-    @GetMapping("/")
-    public ResponseEntity<StaffGroupModel> getBystaffGid(@RequestParam(value = "staffstaffGid", defaultValue = "") String staffGid){
-        return ResponseEntity.ok(groupService.selectById(staffGid));
+    /**
+     * 分页查询
+     *
+     * @param searchValue 搜索条件
+     * @return ResponseEntity<PageResult>
+     */
+    @GetMapping("/gets/tree")
+    public ResponseEntity<List<UserGroupTreeVo>> getUserGroupTreeVoList(StaffGroupModel searchValue) {
+        return ResponseEntity.ok(groupService.getUserGroupTreeVoList(searchValue));
     }
-    //按照学生号，获取多个组的信息
-    @GetMapping("/gets/all")
-    public ResponseEntity<List<StaffGroupModel>> getAllBystaffGid(@RequestParam(value = "staffstaffGids", defaultValue = "") String staffGids){
-        return ResponseEntity.ok(groupService.selectByIds(Arrays.asList(staffGids.split(","))));
-    }
-    // 新建一个组的信息
+
+    /**
+     * 修改或新增方法
+     *
+     * @param groupModel 数据
+     * @return ResponseEntity<StaffModel>
+     */
     @PostMapping("/posts")
-    public ResponseEntity<StaffGroupModel> addStaff(@RequestBody StaffGroupModel group){
-        return ResponseEntity.ok(groupService.addStaffGroup(group));
-    }
-    // 改变一个组的信息
-    @PutMapping("/")
-    @PatchMapping("/")
-    public ResponseEntity<StaffGroupModel> changeBySstaffGid(@RequestBody StaffGroupModel group){
-        return ResponseEntity.ok(groupService.changeStaffGroup(group));
-    }
-    // 删除一个组的信息
-    @DeleteMapping("/")
-    public ResponseEntity<String> deleteBySstaffGid(@RequestParam(value = "staffGid", defaultValue = "") String staffGid){
-        StaffGroupModel group = groupService.selectById(staffGid);
-        if (group == null){
-            return ResponseEntity.ok("该组的信息不存在");
-        }
-        groupService.deleteById(staffGid);
-        return ResponseEntity.ok("");
-    }
-    // 删除一个组的信息
-    @DeleteMapping("/deletes-by-ids")
-    public ResponseEntity<String> deleteBatchBySstaffGids(@RequestParam(value = "staffGid", defaultValue = "") String staffGids){
-        groupService.deleteByIds(Arrays.asList(staffGids.split(",")));
-        return ResponseEntity.ok("");
+    public ResponseEntity<StaffGroupModel> postSchoolModel(@RequestBody StaffGroupModel groupModel) {
+        return ResponseEntity.ok(groupService.postGroupModel(groupModel));
     }
 
-    /* 组内成员的操作 */
-    // 添加一个成员
-    @PostMapping("/{staffGid}")
-    public ResponseEntity<String> addMenber(@PathVariable("staffGid") String staffGid, @RequestParam(value = "member", defaultValue = "") String menber){
-        boolean result = groupMenberService.putMenberIntogroup(staffGid, menber);
-        if (result){
-            return ResponseEntity.ok("");
-        }
-            return ResponseEntity.ok("添加失败");
-    }
-    // 删除一个成员
-    @DeleteMapping("/{staffGid}")
-    public ResponseEntity<String> delMenber(@PathVariable("staffGid") String staffGid, @RequestParam(value = "member", defaultValue = "") String menber){
-        boolean result = groupMenberService.removeMenberOutgroup(staffGid, menber);
-        if (result){
-            return ResponseEntity.ok("");
-        }
-        return ResponseEntity.ok("添加失败");
+    /**
+     * 删除数据
+     *
+     * @param menuIds menuIds
+     * @return ResponseEntity<String>
+     */
+    @GetMapping("/deletes/deletes-by-ids")
+    public ResponseEntity<String> deleteGroupByIds(@RequestParam(value = "groupIds", defaultValue = "") String groupIds) {
+        groupService.deleteGroupByIds(Arrays.asList(groupIds.split(",")));
+        return ResponseEntity.ok("删除成功");
     }
 
+    /**
+     * 复制分组 不会复制用户
+     *
+     * @param sourceIds sourceIds
+     * @param targetIds targetIds
+     * @return ResponseEntity<StaffGroupModel>
+     */
+    @PostMapping("/copy")
+    public ResponseEntity<String> copyGroupToGroups(@RequestParam(value = "sourceIds", defaultValue = "") String sourceIds,
+                                                    @RequestParam(value = "targetIds", defaultValue = "") String targetIds) {
+        groupService.copyGroupToGroups(Arrays.asList(sourceIds.split(",")), Arrays.asList(targetIds.split(",")));
+        return ResponseEntity.ok("操作成功");
+    }
 
+    /**
+     * 移动分组
+     *
+     * @param sourceIds sourceIds
+     * @param targetId  targetId
+     * @return ResponseEntity<String>
+     */
+    @PostMapping("/move")
+    public ResponseEntity<String> moveGroupToGroups(@RequestParam(value = "sourceIds", defaultValue = "") String sourceIds,
+                                                    @RequestParam(value = "targetId", defaultValue = "") String targetId) {
+        groupService.moveGroupToGroups(Arrays.asList(sourceIds.split(",")), targetId);
+        return ResponseEntity.ok("操作成功");
+    }
+
+    /**
+     * 移动用户到分组
+     *
+     * @param userIds  userIds
+     * @param targetId targetId
+     * @return ResponseEntity<String>
+     */
+    @PostMapping("/user/move")
+    public ResponseEntity<String> moveUserToGroups(@RequestParam(value = "userIds", defaultValue = "") String userIds,
+                                                   @RequestParam(value = "targetId", defaultValue = "") String targetId) {
+        groupService.moveUserToGroups(Arrays.asList(userIds.split(",")), targetId);
+        return ResponseEntity.ok("操作成功");
+    }
 
 }

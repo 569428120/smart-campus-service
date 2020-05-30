@@ -13,9 +13,7 @@ import com.xzp.smartcampus.human.model.StaffModel;
 import com.xzp.smartcampus.human.service.IStaffGroupService;
 import com.xzp.smartcampus.human.service.IStaffUserService;
 import com.xzp.smartcampus.system.mapper.RegionMapper;
-import com.xzp.smartcampus.system.model.AuthorityGroupModel;
 import com.xzp.smartcampus.system.model.RegionModel;
-import com.xzp.smartcampus.system.service.IAuthorityGroupService;
 import com.xzp.smartcampus.system.service.IRegionService;
 import com.xzp.smartcampus.system.vo.RegionVo;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +25,15 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
 @Slf4j
 public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, RegionModel> implements IRegionService {
-
-    @Resource
-    private IAuthorityGroupService authorityGroupService;
 
     @Resource
     private StaffMapper userMapper;
@@ -56,11 +54,37 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
      */
     @Override
     public PageResult getRegionListPage(RegionModel searchValue, Integer current, Integer pageSize) {
-        return this.selectPage(new Page<>(current, pageSize), new QueryWrapper<RegionModel>()
+        PageResult<RegionModel> pageResult = this.selectPage(new Page<>(current, pageSize), new QueryWrapper<RegionModel>()
                 .like(StringUtils.isNotBlank(searchValue.getRegionName()), "region_name", searchValue.getRegionName())
                 .like(StringUtils.isNotBlank(searchValue.getEducationName()), "education_name", searchValue.getEducationName())
                 .orderByDesc("create_time")
         );
+        return new PageResult<>(pageResult.getTotal(), pageResult.getTotalPage(), this.toRegionVoList(pageResult.getData()));
+    }
+
+    /**
+     * 转换为vo对象
+     *
+     * @param data data
+     * @return List<RegionVo>
+     */
+    private List<RegionVo> toRegionVoList(List<RegionModel> data) {
+        if (CollectionUtils.isEmpty(data)) {
+            return Collections.emptyList();
+        }
+        List<StaffModel> staffModels = userService.selectByIds(data.stream().map(RegionModel::getAdminUserId).collect(Collectors.toList()));
+        Map<String, StaffModel> userIdToModelMap = CollectionUtils.isEmpty(staffModels) ? Collections.emptyMap() : staffModels.stream().collect(Collectors.toMap(StaffModel::getId, v -> v));
+        return data.stream().map(item -> {
+            RegionVo vo = new RegionVo();
+            BeanUtils.copyProperties(item, vo);
+            StaffModel admin = userIdToModelMap.get(item.getAdminUserId());
+            if (admin != null) {
+                vo.setUserName(admin.getUserName());
+                vo.setPassword(admin.getUserPassword());
+                vo.setContact(admin.getContact());
+            }
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -71,18 +95,28 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
      */
     @Override
     public RegionModel postRegionModel(RegionVo regionVo) {
-        // 校验数据
-        this.validatorRegion(regionVo);
         // 新增操作
         if (StringUtils.isBlank(regionVo.getId())) {
             regionVo.setId(SqlUtil.getUUId());
-            AuthorityGroupModel authorityTemplate = this.createAuthorityTemplate(regionVo.getId(), regionVo.getAuthorityTemplateId());
-            this.createAdminUserGroup(authorityTemplate, regionVo.getUserName(), regionVo.getPassword());
+            regionVo.setRegionId(regionVo.getId());
+            StaffModel admin = this.createAdminUserGroup(regionVo.getAuthorityTemplateId(), regionVo);
+            regionVo.setAdminUserId(admin.getId());
             this.insert(regionVo);
             return regionVo;
         }
+        // 更新管理员用户
+        this.updateAdminUser(regionVo.getAdminUserId(), regionVo);
         this.updateRegionModel(regionVo);
         return regionVo;
+    }
+
+    /**
+     * 更新用户数据
+     *
+     * @param adminUserId adminUserId
+     */
+    private void updateAdminUser(String adminUserId, RegionVo regionVo) {
+        this.updateAdminUser(regionVo.getId(), regionVo.getSchoolId(), adminUserId, regionVo.getAuthorityTemplateId(), regionVo.getPassword(), regionVo.getContact());
     }
 
     /**
@@ -92,70 +126,113 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
      */
     @Override
     public void validatorRegion(RegionVo regionVo) {
-        // 权限模板不能为空
-        if (StringUtils.isBlank(regionVo.getAuthorityTemplateId())) {
-            log.warn("authorityTemplateId is null");
-            throw new SipException(MessageFormat.format("参数错误，authorityTemplateId {0} 为空", regionVo.getAuthorityTemplateId()));
-        }
         // 管理员用户用户名不能存在（不做数据隔离）
-        List<StaffModel> userList = userMapper.selectList(new QueryWrapper<StaffModel>()
-                .eq("user_name", regionVo.getUserName())
-                .notIn(StringUtils.isNotBlank(regionVo.getAdminUserId()), "id", regionVo.getAdminUserId())
-        );
-        if (!CollectionUtils.isEmpty(userList)) {
-            log.warn("exist user {}", userList.get(0));
-            throw new SipException(MessageFormat.format("{0} 用户已经存在", regionVo.getUserName()));
+        if (StringUtils.isNotBlank(regionVo.getUserName())) {
+            List<StaffModel> userList = userMapper.selectList(new QueryWrapper<StaffModel>()
+                    .eq("user_name", regionVo.getUserName())
+                    .notIn(StringUtils.isNotBlank(regionVo.getAdminUserId()), "id", regionVo.getAdminUserId())
+            );
+            if (!CollectionUtils.isEmpty(userList)) {
+                log.warn("exist user {}", userList.get(0));
+                throw new SipException(MessageFormat.format("{0} 用户已经存在", regionVo.getUserName()));
+            }
+        }
+
+    }
+
+    /**
+     * 创建管理员用户
+     *
+     * @param regionId            区域id
+     * @param schoolId            学校id
+     * @param authorityTemplateId 权限模板id
+     * @param password            登录密码
+     * @param contact             手机号
+     * @return StaffModel
+     */
+    @Override
+    public StaffModel createAdminUserGroup(String regionId, String schoolId, String authorityTemplateId, String password, String contact) {
+        if (StringUtils.isBlank(authorityTemplateId) || StringUtils.isBlank(contact) || StringUtils.isBlank(password)) {
+            throw new SipException("authorityTemplate or userName or password is null");
+        }
+        // 创建管理员用户组
+        StaffGroupModel staffGroupModel = createGroupModel(regionId, schoolId, authorityTemplateId);
+
+        StaffModel staffModel = new StaffModel();
+        staffModel.setId(SqlUtil.getUUId());
+        staffModel.setName("系统预制管理员");
+        staffModel.setUserName(contact);
+        staffModel.setUserPassword(password);
+        staffModel.setContact(contact);
+        staffModel.setGroupId(staffGroupModel.getId());
+        staffModel.setRegionId(regionId);
+        staffModel.setSchoolId(schoolId);
+        userService.insert(staffModel);
+        return staffModel;
+    }
+
+    private StaffGroupModel createGroupModel(String regionId, String schoolId, String authorityTemplateId) {
+        StaffGroupModel staffGroupModel = new StaffGroupModel();
+        staffGroupModel.setId(SqlUtil.getUUId());
+        staffGroupModel.setAuthorityId(authorityTemplateId);
+        staffGroupModel.setGroupName("管理员");
+        staffGroupModel.setGroupCode(staffGroupModel.getId());
+        staffGroupModel.setPid(Constant.ROOT);
+        staffGroupModel.setTreePath(Constant.ROOT + Constant.TREE_SEPARATOR + staffGroupModel.getId());
+        staffGroupModel.setDescription("系统自动生成的管理员用户");
+        staffGroupModel.setRegionId(regionId);
+        staffGroupModel.setSchoolId(schoolId);
+        staffGroupService.insert(staffGroupModel);
+        return staffGroupModel;
+    }
+
+    /**
+     * 更新管理员用户信息
+     *
+     * @param userId              用户id
+     * @param authorityTemplateId 权限模板id
+     * @param password            密码
+     * @param contact             手机号码
+     */
+    @Override
+    public void updateAdminUser(String regionId, String schoolId, String userId, String authorityTemplateId, String password, String contact) {
+        if (StringUtils.isBlank(userId)) {
+            log.warn("userId is null");
+            return;
+        }
+        StaffModel adminUser = userMapper.selectById(userId);
+        if (adminUser == null) {
+            log.info("not find adminUser by adminUserId {},create new adminUser", userId);
+            this.createAdminUserGroup(regionId, schoolId, authorityTemplateId, password, contact);
+            return;
+        } else {
+            StaffGroupModel groupModel = staffGroupService.selectById(adminUser.getGroupId());
+            if (groupModel == null) {
+                log.error("not find adminUser by groupId {}", adminUser.getGroupId());
+                throw new SipException("数据错误，用户分组已被删除 groupId " + adminUser.getGroupId());
+            }
+            if (StringUtils.isNotBlank(password)) {
+                adminUser.setUserPassword(password);
+            }
+            if (StringUtils.isNotBlank(contact)) {
+                adminUser.setContact(contact);
+                adminUser.setUserName(contact);
+            }
+            if (StringUtils.isNotBlank(authorityTemplateId)) {
+                groupModel.setAuthorityId(authorityTemplateId);
+            }
+            userMapper.updateById(adminUser);
+            staffGroupService.updateById(groupModel);
         }
     }
 
     /**
      * 创建管理员用户组
      *
-     * @param authorityTemplate authorityTemplate
-     * @param userName          登录用户名
-     * @param password          密码
+     * @param authorityTemplateId authorityTemplate
      */
-    private void createAdminUserGroup(AuthorityGroupModel authorityTemplate, String userName, String password) {
-        if (authorityTemplate == null || StringUtils.isBlank(userName) || StringUtils.isBlank(password)) {
-            throw new SipException("authorityTemplate or userName or password is null");
-        }
-        // 创建管理员用户组
-        StaffGroupModel staffGroupModel = new StaffGroupModel();
-        staffGroupModel.setId(SqlUtil.getUUId());
-        staffGroupModel.setAuthorityId(authorityTemplate.getId());
-        staffGroupModel.setGroupName("管理员");
-        staffGroupModel.setGroupCode(staffGroupModel.getId());
-        staffGroupModel.setPid(Constant.ROOT);
-        staffGroupModel.setTreePath(Constant.ROOT + staffGroupModel.getId());
-        staffGroupModel.setDescription("系统自动生成的管理员用户");
-        staffGroupService.insert(staffGroupModel);
-
-        StaffModel staffModel = new StaffModel();
-        staffModel.setId(SqlUtil.getUUId());
-        staffModel.setName("系统预制管理员");
-        staffModel.setUserName(userName);
-        staffModel.setUserPassword(password);
-        userService.insert(staffModel);
-    }
-
-    /**
-     * 保存权限模板
-     */
-    private AuthorityGroupModel createAuthorityTemplate(String regionId, String authorityTemplateId) {
-        if (StringUtils.isBlank(regionId) || StringUtils.isBlank(authorityTemplateId)) {
-            log.info("regionId or authorityTemplateId is null");
-            throw new SipException("regionId or authorityTemplateId is null");
-        }
-        // 查询当前租户是否已经存在权限模板
-        List<AuthorityGroupModel> authorityGroupModels = authorityGroupService.selectList(new QueryWrapper<AuthorityGroupModel>()
-                .eq("template", true)
-        );
-        if (!CollectionUtils.isEmpty(authorityGroupModels)) {
-            log.info("template is exist");
-            return authorityGroupModels.get(0);
-        }
-        // 不存在权限模板则创建模板
-        return authorityGroupService.copyAuthorityGroupTemplate(authorityTemplateId);
+    private StaffModel createAdminUserGroup(String authorityTemplateId, RegionVo regionVo) {
+        return this.createAdminUserGroup(regionVo.getId(), regionVo.getSchoolId(), authorityTemplateId, regionVo.getPassword(), regionVo.getContact());
     }
 
     /**

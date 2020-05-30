@@ -3,17 +3,60 @@ package com.xzp.smartcampus.human.service;
 
 import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.human.model.StaffGroupModel;
+import com.xzp.smartcampus.human.vo.UserGroupTreeVo;
+
+import java.util.List;
 
 /**
  * 学生信息系统
  */
 public interface IStaffGroupService extends IBaseService<StaffGroupModel> {
-    /* 新增一个组的信息，需要信息判断，不能直接 Insert */
-    public StaffGroupModel addStaffGroup(StaffGroupModel StaffGroup);
 
-    /* 修改一个学生组信息，需要信息判断，并且把 Restful PATCH/PUT 合为一体 */
-    public StaffGroupModel changeStaffGroup(StaffGroupModel StaffGroup);
+    /**
+     * 查询树节点
+     *
+     * @param searchValue searchValue
+     * @return List<UserGroupTreeVo>
+     */
+    List<UserGroupTreeVo> getUserGroupTreeVoList(StaffGroupModel searchValue);
+
+    /**
+     * 保存
+     *
+     * @param groupModel groupModel
+     * @return StaffGroupModel
+     */
+    StaffGroupModel postGroupModel(StaffGroupModel groupModel);
 
 
+    /**
+     * 复制分组
+     *
+     * @param sourceIds sourceIds
+     * @param targetIds targetIds
+     */
+    void copyGroupToGroups(List<String> sourceIds, List<String> targetIds);
 
+    /**
+     * 移动分组
+     *
+     * @param sourceIds sourceIds
+     * @param targetId  targetId
+     */
+    void moveGroupToGroups(List<String> sourceIds, String targetId);
+
+    /**
+     * 移动用户到分组
+     *
+     * @param userIds  userIds
+     * @param targetId targetId
+     */
+    void moveUserToGroups(List<String> userIds, String targetId);
+
+    /**
+     * 删除分组
+     *
+     * @param groupIds groupIds
+     */
+    void deleteGroupByIds(List<String> groupIds);
 }

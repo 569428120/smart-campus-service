@@ -8,15 +8,12 @@ import com.xzp.smartcampus.common.service.IsolationBaseService;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.mapper.AuthorityGroupMapper;
-import com.xzp.smartcampus.system.mapper.RegionMapper;
 import com.xzp.smartcampus.system.model.AuthorityGroupModel;
 import com.xzp.smartcampus.system.model.AuthorityGroupToMenuModel;
-import com.xzp.smartcampus.system.model.RegionModel;
 import com.xzp.smartcampus.system.service.IAuthorityGroupService;
 import com.xzp.smartcampus.system.service.IAuthorityGroupToMenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -96,10 +93,12 @@ public class AuthorityGroupServiceImpl extends IsolationBaseService<AuthorityGro
     /**
      * 权限模板
      *
-     * @param authorityTemplateId authorityTemplateId
+     * @param authorityTemplateId templateId
+     * @param regionId            regionId
+     * @param schoolId            schoolId
      */
     @Override
-    public AuthorityGroupModel copyAuthorityGroupTemplate(String authorityTemplateId) {
+    public AuthorityGroupModel copyAuthorityGroupTemplate(String authorityTemplateId, String regionId, String schoolId) {
         if (StringUtils.isBlank(authorityTemplateId)) {
             log.warn("authorityTemplateId is null");
             throw new SipException("参数错误，authorityTemplateId 为空");
@@ -114,14 +113,19 @@ public class AuthorityGroupServiceImpl extends IsolationBaseService<AuthorityGro
         );
         // 复制数据
         groupModel.setId(SqlUtil.getUUId());
-        this.insert(groupModel);
+        groupModel.setTemplate(1);
+        groupModel.setRegionId(regionId);
+        groupModel.setSchoolId(schoolId);
         if (!CollectionUtils.isEmpty(menuModels)) {
             menuModels.forEach(item -> {
                 item.setId(SqlUtil.getUUId());
                 item.setGroupId(groupModel.getId());
+                item.setRegionId(regionId);
+                item.setSchoolId(schoolId);
             });
             groupToMenuService.insertBatch(menuModels);
         }
+        this.insert(groupModel);
         return groupModel;
     }
 }

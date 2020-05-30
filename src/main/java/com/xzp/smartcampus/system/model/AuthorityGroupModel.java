@@ -15,7 +15,7 @@ public class AuthorityGroupModel extends BaseModel {
     /**
      * 是否为模板
      */
-    private Boolean template;
+    private Integer template;
 
     /**
      * 权限名称

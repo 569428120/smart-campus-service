@@ -4,6 +4,7 @@ package com.xzp.smartcampus.system.web;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.model.SchoolModel;
 import com.xzp.smartcampus.system.service.ISchoolService;
+import com.xzp.smartcampus.system.vo.SchoolVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,12 +48,12 @@ public class SchoolController {
     /**
      * 修改或新增方法
      *
-     * @param schoolModel 数据
+     * @param schoolVo 数据
      * @return ResponseEntity<RegionModel>
      */
     @PostMapping("/posts")
-    public ResponseEntity<SchoolModel> postSchoolModel(@RequestBody SchoolModel schoolModel) {
-        return ResponseEntity.ok(schoolService.postSchoolModel(schoolModel));
+    public ResponseEntity<SchoolVo> postSchoolModel(@RequestBody SchoolVo schoolVo) {
+        return ResponseEntity.ok(schoolService.postSchoolModel(schoolVo));
     }
 
 

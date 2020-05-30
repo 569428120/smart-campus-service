@@ -1,5 +1,6 @@
 package com.xzp.smartcampus.device.agent.hpt.web;
 
+import com.sun.javafx.collections.MappingChange;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ public class CardGateController {
 
 
     @PostMapping("/posts")
-    public ResponseEntity<Map<String, Object>> postData(@RequestBody Map<String, Object> body,
+    public ResponseEntity<Map<String, Object>> postData(@RequestBody MappingChange.Map<String, Object> body,
                                                         @RequestParam(value = "m") String m,
                                                         @RequestParam(value = "a") String a) {
 

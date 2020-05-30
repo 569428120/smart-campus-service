@@ -33,7 +33,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @param wrapper  wrapper
      * @param userInfo userInfo
      */
-    protected abstract void initTenant(QueryWrapper wrapper, LoginUserInfo userInfo);
+    protected abstract void initTenant(QueryWrapper<T> wrapper, LoginUserInfo userInfo);
 
     /**
      * 设置数据隔离的参数
@@ -41,7 +41,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @param wrapper  wrapper
      * @param userInfo userInfo
      */
-    protected abstract void initTenant(UpdateWrapper wrapper, LoginUserInfo userInfo);
+    protected abstract void initTenant(UpdateWrapper<T> wrapper, LoginUserInfo userInfo);
 
 
     /**
