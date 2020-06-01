@@ -59,4 +59,12 @@ public interface IStaffGroupService extends IBaseService<StaffGroupModel> {
      * @param groupIds groupIds
      */
     void deleteGroupByIds(List<String> groupIds);
+
+    /**
+     * 获取父节点
+     *
+     * @param groupModels groupModels
+     * @return List<String>
+     */
+    List<String> getNotFindPids(List<StaffGroupModel> groupModels);
 }

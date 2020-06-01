@@ -1,5 +1,7 @@
 package com.xzp.smartcampus.human.model;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
@@ -45,17 +47,18 @@ public class StaffModel extends BaseModel {
     private String userPassword;
 
     //`user_identity` varchar(255) NOT NULL COMMENT '身份证号码',
+    @TableField(strategy = FieldStrategy.IGNORED)
     private String userIdentity;
 
     //`user_job_code` varchar(255) NOT NULL COMMENT '工号',
     private String userJobCode;
 
     //`address` varchar(255) DEFAULT NULL COMMENT '住址',
+    @TableField(strategy = FieldStrategy.IGNORED)
     private String address;
 
     /**
      * 手机号码
      */
     private String contact;
-
 }

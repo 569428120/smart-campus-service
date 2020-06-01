@@ -68,7 +68,8 @@ public class StaffGroupServiceImpl extends IsolationBaseService<StaffGroupMapper
      * @param groupModels groupModels
      * @return List<String>
      */
-    private List<String> getNotFindPids(List<StaffGroupModel> groupModels) {
+    @Override
+    public List<String> getNotFindPids(List<StaffGroupModel> groupModels) {
         if (CollectionUtils.isEmpty(groupModels)) {
             return Collections.emptyList();
         }

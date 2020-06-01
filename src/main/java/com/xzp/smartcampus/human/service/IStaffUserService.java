@@ -4,6 +4,7 @@ package com.xzp.smartcampus.human.service;
 import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.StaffModel;
+import com.xzp.smartcampus.human.vo.UserVo;
 
 /**
  * 员工信息系统
@@ -18,7 +19,7 @@ public interface IStaffUserService extends IBaseService<StaffModel> {
      * @param pageSize    页数量
      * @return PageResult<StaffModel>
      */
-    PageResult<StaffModel> getStaffListPage(StaffModel searchValue, Integer current, Integer pageSize);
+    PageResult<UserVo> getUserVoListPage(StaffModel searchValue, Integer current, Integer pageSize);
 
     /**
      * 保存数据
