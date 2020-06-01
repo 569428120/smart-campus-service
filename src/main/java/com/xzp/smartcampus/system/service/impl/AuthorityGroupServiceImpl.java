@@ -8,10 +8,8 @@ import com.xzp.smartcampus.common.service.IsolationBaseService;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.mapper.AuthorityGroupMapper;
-import com.xzp.smartcampus.system.mapper.RegionMapper;
 import com.xzp.smartcampus.system.model.AuthorityGroupModel;
 import com.xzp.smartcampus.system.model.AuthorityGroupToMenuModel;
-import com.xzp.smartcampus.system.model.RegionModel;
 import com.xzp.smartcampus.system.service.IAuthorityGroupService;
 import com.xzp.smartcampus.system.service.IAuthorityGroupToMenuService;
 import lombok.extern.slf4j.Slf4j;
@@ -90,5 +88,44 @@ public class AuthorityGroupServiceImpl extends IsolationBaseService<AuthorityGro
                 .in("group_id", groupIds)
         );
         this.deleteByIds(groupIds);
+    }
+
+    /**
+     * 权限模板
+     *
+     * @param authorityTemplateId templateId
+     * @param regionId            regionId
+     * @param schoolId            schoolId
+     */
+    @Override
+    public AuthorityGroupModel copyAuthorityGroupTemplate(String authorityTemplateId, String regionId, String schoolId) {
+        if (StringUtils.isBlank(authorityTemplateId)) {
+            log.warn("authorityTemplateId is null");
+            throw new SipException("参数错误，authorityTemplateId 为空");
+        }
+        AuthorityGroupModel groupModel = this.selectById(authorityTemplateId);
+        if (groupModel == null) {
+            log.warn("not AuthorityGroupModel by id {}", authorityTemplateId);
+            throw new SipException("参数错误，找不到AuthorityGroupModel authorityTemplateId为" + authorityTemplateId);
+        }
+        List<AuthorityGroupToMenuModel> menuModels = groupToMenuService.selectList(new QueryWrapper<AuthorityGroupToMenuModel>()
+                .eq("group_id", groupModel.getId())
+        );
+        // 复制数据
+        groupModel.setId(SqlUtil.getUUId());
+        groupModel.setTemplate(1);
+        groupModel.setRegionId(regionId);
+        groupModel.setSchoolId(schoolId);
+        if (!CollectionUtils.isEmpty(menuModels)) {
+            menuModels.forEach(item -> {
+                item.setId(SqlUtil.getUUId());
+                item.setGroupId(groupModel.getId());
+                item.setRegionId(regionId);
+                item.setSchoolId(schoolId);
+            });
+            groupToMenuService.insertBatch(menuModels);
+        }
+        this.insert(groupModel);
+        return groupModel;
     }
 }

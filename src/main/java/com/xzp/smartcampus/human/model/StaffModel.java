@@ -1,5 +1,7 @@
 package com.xzp.smartcampus.human.model;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
@@ -26,18 +28,12 @@ import lombok.EqualsAndHashCode;
 */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "tb_human_ser_student")
+@TableName(value = "tb_human_ser_staff")
 public class StaffModel extends BaseModel {
-    // 这些字段在 BaseModel 里
-    // `id` varchar(32) NOT NULL COMMENT 'id', 自动增长
-    //`region_id` varchar(32) DEFAULT NULL COMMENT '所属教育局',
-    //`school_id` varchar(32) DEFAULT NULL COMMENT '所属学校',
-    //`create_time` datetime DEFAULT NULL COMMENT '创建时间',
-    //`update_time` datetime DEFAULT NULL COMMENT '更新时间',
-    //`logic_del` tinyint(2) DEFAULT NULL COMMENT '逻辑删除',
 
     //`group_id` varchar(32) NOT NULL COMMENT '分组id',
     private String groupId;
+
     //`name` varchar(64) NOT NULL COMMENT '名称',
     private String name;
 
@@ -51,12 +47,18 @@ public class StaffModel extends BaseModel {
     private String userPassword;
 
     //`user_identity` varchar(255) NOT NULL COMMENT '身份证号码',
+    @TableField(strategy = FieldStrategy.IGNORED)
     private String userIdentity;
 
     //`user_job_code` varchar(255) NOT NULL COMMENT '工号',
     private String userJobCode;
 
     //`address` varchar(255) DEFAULT NULL COMMENT '住址',
+    @TableField(strategy = FieldStrategy.IGNORED)
     private String address;
 
+    /**
+     * 手机号码
+     */
+    private String contact;
 }

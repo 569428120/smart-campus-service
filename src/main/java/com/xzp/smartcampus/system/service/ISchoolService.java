@@ -3,6 +3,7 @@ package com.xzp.smartcampus.system.service;
 import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.model.SchoolModel;
+import com.xzp.smartcampus.system.vo.SchoolVo;
 
 /**
  * 学校业务
@@ -22,8 +23,8 @@ public interface ISchoolService extends IBaseService<SchoolModel> {
     /**
      * 保存或者更新
      *
-     * @param schoolModel schoolModel
+     * @param schoolVo schoolVo
      * @return SchoolModel
      */
-    SchoolModel postSchoolModel(SchoolModel schoolModel);
+    SchoolVo postSchoolModel(SchoolVo schoolVo);
 }

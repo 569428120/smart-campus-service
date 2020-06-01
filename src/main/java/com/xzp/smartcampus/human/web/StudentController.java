@@ -1,9 +1,6 @@
 package com.xzp.smartcampus.human.web;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.xzp.smartcampus.human.model.FuckTestModel;
 import com.xzp.smartcampus.human.model.StudentModel;
-import com.xzp.smartcampus.human.service.FuckTestService;
 import com.xzp.smartcampus.human.service.StudentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

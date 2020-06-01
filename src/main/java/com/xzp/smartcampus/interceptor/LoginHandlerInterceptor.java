@@ -34,7 +34,7 @@ public class LoginHandlerInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         return true;
-        /*   TODO 方便测试先注释
+        /*   TODO 方便测试先注释, 硬件回调的接口都不做校验
         String token = request.getHeader("authentication");
         // 没有登录
         if (StringUtils.isBlank(token)) {

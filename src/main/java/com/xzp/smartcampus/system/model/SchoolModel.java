@@ -12,6 +12,15 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "tb_sys_ser_school")
 public class SchoolModel extends BaseModel {
 
+    /**
+     * 权限模板id
+     */
+    private String authorityTemplateId;
+
+    /**
+     * 管理员id
+     */
+    private String adminUserId;
 
     /**
      * TODO 暂时不用
@@ -50,10 +59,4 @@ public class SchoolModel extends BaseModel {
      */
     @TableField(strategy = FieldStrategy.IGNORED)
     private String description;
-
-    /**
-     * 教育局名称
-     */
-    @TableField(exist = false)
-    private String regionName;
 }

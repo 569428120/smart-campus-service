@@ -35,4 +35,13 @@ public interface IAuthorityGroupService extends IBaseService<AuthorityGroupModel
      * @param groupIds groupIds
      */
     void deleteAuthorityGroupByIds(List<String> groupIds);
+
+    /**
+     * 权限模板
+     *
+     * @param authorityTemplateId templateId
+     * @param regionId            regionId
+     * @param schoolId            schoolId
+     */
+    AuthorityGroupModel copyAuthorityGroupTemplate(String authorityTemplateId, String regionId, String schoolId);
 }

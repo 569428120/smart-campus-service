@@ -22,6 +22,16 @@ public class LoginUserInfo {
     private String userType;
 
     /**
+     * 区域id
+     */
+    private String regionId;
+
+    /**
+     * 学校id
+     */
+    private String schoolId;
+
+    /**
      * 教育局map
      */
     private Map<String, String> regionIdToName;

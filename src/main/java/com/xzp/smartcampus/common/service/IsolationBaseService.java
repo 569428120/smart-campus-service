@@ -1,12 +1,14 @@
 package com.xzp.smartcampus.common.service;
 
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
+import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xzp.smartcampus.common.model.BaseModel;
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 
@@ -26,13 +28,34 @@ public class IsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @param userInfo userInfo
      */
     @Override
-    protected void initTenant(QueryWrapper wrapper, LoginUserInfo userInfo) {
-        if (!CollectionUtils.isEmpty(userInfo.getRegionIdToName())) {
-            wrapper.in("region_id", userInfo.getRegionIdToName().keySet());
+    protected void initTenant(QueryWrapper<T> wrapper, LoginUserInfo userInfo) {
+        this.setTenantWrapper(wrapper, userInfo);
+    }
+
+    private void setTenantWrapper(AbstractWrapper wrapper, LoginUserInfo userInfo) {
+        MergeSegments segments = wrapper.getExpression();
+        String normalSql = segments.getNormal().getSqlSegment();
+        segments.getNormal().clear();
+        segments.getNormal().add((ISqlSegment) () -> this.getTenantSqlSegment(userInfo));
+        segments.getNormal().add((ISqlSegment) () -> "( " + (StringUtils.isBlank(normalSql) ? "1=1" : normalSql) + " )");
+    }
+
+    /**
+     * 租户隔离sql条件
+     *
+     * @param userInfo userInfo
+     * @return String
+     */
+    private String getTenantSqlSegment(LoginUserInfo userInfo) {
+        if (userInfo == null) {
+            return "";
         }
-        if (!CollectionUtils.isEmpty(userInfo.getSchoolIdToName())) {
-            wrapper.in("school_id", userInfo.getSchoolIdToName().keySet());
-        }
+        return "(" +
+                "region_id" + ((StringUtils.isBlank(userInfo.getRegionId()) ? " is null" : (" = '" + userInfo.getRegionId()) + "'")) +
+                " AND " +
+                "school_id" + ((StringUtils.isBlank(userInfo.getSchoolId()) ? " is null" : (" = '" + userInfo.getSchoolId()) + "'")) +
+                ")" +
+                " AND ";
     }
 
     /**
@@ -42,13 +65,8 @@ public class IsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> 
      * @param userInfo userInfo
      */
     @Override
-    protected void initTenant(UpdateWrapper wrapper, LoginUserInfo userInfo) {
-        if (!CollectionUtils.isEmpty(userInfo.getRegionIdToName())) {
-            wrapper.in("region_id", userInfo.getRegionIdToName().keySet());
-        }
-        if (!CollectionUtils.isEmpty(userInfo.getSchoolIdToName())) {
-            wrapper.in("school_id", userInfo.getSchoolIdToName().keySet());
-        }
+    protected void initTenant(UpdateWrapper<T> wrapper, LoginUserInfo userInfo) {
+        this.setTenantWrapper(wrapper, userInfo);
     }
 
     /**
@@ -59,16 +77,11 @@ public class IsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     protected void initTenant(T model, LoginUserInfo userInfo) {
-        if (!CollectionUtils.isEmpty(userInfo.getRegionIdToName()) && StringUtils.isBlank(model.getRegionId())) {
-            userInfo.getRegionIdToName().keySet().forEach(regionId -> {
-                model.setRegionId(regionId);
-            });
-
+        if (StringUtils.isBlank(model.getRegionId())) {
+            model.setRegionId(userInfo.getRegionId());
         }
-        if (!CollectionUtils.isEmpty(userInfo.getSchoolIdToName()) && StringUtils.isBlank(model.getSchoolId())) {
-            userInfo.getSchoolIdToName().keySet().forEach(schoolId -> {
-                model.setSchoolId(schoolId);
-            });
+        if (StringUtils.isBlank(model.getSchoolId())) {
+            model.setSchoolId(userInfo.getSchoolId());
         }
     }
 

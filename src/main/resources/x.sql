@@ -501,7 +501,7 @@ COMMENT ON COLUMN "public"."tb_human_ser_student_group"."update_time" IS '更新
 COMMENT ON COLUMN "public"."tb_human_ser_student_group"."logic_del" IS '逻辑删除';
 COMMENT ON COLUMN "public"."tb_human_ser_student_group"."pid" IS '父节点id';
 COMMENT ON COLUMN "public"."tb_human_ser_student_group"."tree_path" IS '结构关系';
-COMMENT ON COLUMN "public"."tb_human_ser_student_group"."type" IS '班级，分组';
+COMMENT ON COLUMN "public"."tb_human_ser_student_group"."type" IS '年级,班级，分组';
 COMMENT ON COLUMN "public"."tb_human_ser_student_group"."grade_name" IS '年级名称';
 COMMENT ON COLUMN "public"."tb_human_ser_student_group"."grade_level" IS '年级编码，比如一年级 就为1';
 COMMENT ON COLUMN "public"."tb_human_ser_student_group"."group_name" IS '班级或者分组名称';
