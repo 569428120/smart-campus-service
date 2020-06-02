@@ -7,6 +7,7 @@ import com.xzp.smartcampus.common.service.NonIsolationBaseService;
 import com.xzp.smartcampus.common.utils.Constant;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
+import com.xzp.smartcampus.human.mapper.StaffGroupMapper;
 import com.xzp.smartcampus.human.mapper.StaffMapper;
 import com.xzp.smartcampus.human.model.StaffGroupModel;
 import com.xzp.smartcampus.human.model.StaffModel;
@@ -37,6 +38,9 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
 
     @Resource
     private StaffMapper userMapper;
+
+    @Resource
+    private StaffGroupMapper groupMapper;
 
     @Resource
     private IStaffGroupService staffGroupService;
@@ -72,7 +76,7 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
         if (CollectionUtils.isEmpty(data)) {
             return Collections.emptyList();
         }
-        List<StaffModel> staffModels = userService.selectByIds(data.stream().map(RegionModel::getAdminUserId).collect(Collectors.toList()));
+        List<StaffModel> staffModels = userMapper.selectBatchIds(data.stream().map(RegionModel::getAdminUserId).collect(Collectors.toList()));
         Map<String, StaffModel> userIdToModelMap = CollectionUtils.isEmpty(staffModels) ? Collections.emptyMap() : staffModels.stream().collect(Collectors.toMap(StaffModel::getId, v -> v));
         return data.stream().map(item -> {
             RegionVo vo = new RegionVo();
@@ -105,7 +109,8 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
             return regionVo;
         }
         // 更新管理员用户
-        this.updateAdminUser(regionVo.getAdminUserId(), regionVo);
+        StaffModel staffModel = this.updateAdminUser(regionVo.getAdminUserId(), regionVo);
+        regionVo.setAdminUserId(staffModel.getId());
         this.updateRegionModel(regionVo);
         return regionVo;
     }
@@ -115,8 +120,8 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
      *
      * @param adminUserId adminUserId
      */
-    private void updateAdminUser(String adminUserId, RegionVo regionVo) {
-        this.updateAdminUser(regionVo.getId(), regionVo.getSchoolId(), adminUserId, regionVo.getAuthorityTemplateId(), regionVo.getPassword(), regionVo.getContact());
+    private StaffModel updateAdminUser(String adminUserId, RegionVo regionVo) {
+        return this.updateAdminUser(regionVo.getId(), regionVo.getSchoolId(), adminUserId, regionVo.getAuthorityTemplateId(), regionVo.getPassword(), regionVo.getContact());
     }
 
     /**
@@ -143,21 +148,16 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
     /**
      * 创建管理员用户
      *
-     * @param regionId            区域id
-     * @param schoolId            学校id
-     * @param authorityTemplateId 权限模板id
-     * @param password            登录密码
-     * @param contact             手机号
+     * @param staffGroupModel 区域id
+     * @param password        登录密码
+     * @param contact         手机号
      * @return StaffModel
      */
     @Override
-    public StaffModel createAdminUserGroup(String regionId, String schoolId, String authorityTemplateId, String password, String contact) {
-        if (StringUtils.isBlank(authorityTemplateId) || StringUtils.isBlank(contact) || StringUtils.isBlank(password)) {
+    public StaffModel createAdminUserGroup(StaffGroupModel staffGroupModel, String password, String contact) {
+        if (StringUtils.isBlank(contact) || StringUtils.isBlank(password)) {
             throw new SipException("authorityTemplate or userName or password is null");
         }
-        // 创建管理员用户组
-        StaffGroupModel staffGroupModel = createGroupModel(regionId, schoolId, authorityTemplateId);
-
         StaffModel staffModel = new StaffModel();
         staffModel.setId(SqlUtil.getUUId());
         staffModel.setName("系统预制管理员");
@@ -165,8 +165,8 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
         staffModel.setUserPassword(password);
         staffModel.setContact(contact);
         staffModel.setGroupId(staffGroupModel.getId());
-        staffModel.setRegionId(regionId);
-        staffModel.setSchoolId(schoolId);
+        staffModel.setRegionId(staffGroupModel.getRegionId());
+        staffModel.setSchoolId(staffGroupModel.getSchoolId());
         userService.insert(staffModel);
         return staffModel;
     }
@@ -195,35 +195,52 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
      * @param contact             手机号码
      */
     @Override
-    public void updateAdminUser(String regionId, String schoolId, String userId, String authorityTemplateId, String password, String contact) {
+    public StaffModel updateAdminUser(String regionId, String schoolId, String userId, String authorityTemplateId, String password, String contact) {
         if (StringUtils.isBlank(userId)) {
             log.warn("userId is null");
-            return;
+            throw new SipException("参数错误，用户id不能为空");
         }
+        List<StaffGroupModel> groupModels = groupMapper.selectList(new QueryWrapper<StaffGroupModel>()
+                .eq(StringUtils.isNotBlank(regionId), "region_id", regionId)
+                .eq(StringUtils.isNotBlank(schoolId), "school_id", schoolId)
+                .eq("group_name", "管理员")
+        );
         StaffModel adminUser = userMapper.selectById(userId);
+        StaffGroupModel adminGroup = CollectionUtils.isEmpty(groupModels) ? this.createGroupModel(regionId, schoolId, authorityTemplateId) : groupModels.get(0);
         if (adminUser == null) {
             log.info("not find adminUser by adminUserId {},create new adminUser", userId);
-            this.createAdminUserGroup(regionId, schoolId, authorityTemplateId, password, contact);
-            return;
-        } else {
-            StaffGroupModel groupModel = staffGroupService.selectById(adminUser.getGroupId());
-            if (groupModel == null) {
-                log.error("not find adminUser by groupId {}", adminUser.getGroupId());
-                throw new SipException("数据错误，用户分组已被删除 groupId " + adminUser.getGroupId());
-            }
-            if (StringUtils.isNotBlank(password)) {
-                adminUser.setUserPassword(password);
-            }
-            if (StringUtils.isNotBlank(contact)) {
-                adminUser.setContact(contact);
-                adminUser.setUserName(contact);
-            }
-            if (StringUtils.isNotBlank(authorityTemplateId)) {
-                groupModel.setAuthorityId(authorityTemplateId);
-            }
-            userMapper.updateById(adminUser);
-            staffGroupService.updateById(groupModel);
+            adminUser = this.createAdminUserGroup(adminGroup, password, contact);
         }
+        adminUser.setGroupId(adminGroup.getId());
+        if (StringUtils.isNotBlank(password)) {
+            adminUser.setUserPassword(password);
+        }
+        if (StringUtils.isNotBlank(contact)) {
+            adminUser.setContact(contact);
+            adminUser.setUserName(contact);
+        }
+        if (StringUtils.isNotBlank(authorityTemplateId)) {
+            adminGroup.setAuthorityId(authorityTemplateId);
+        }
+        userMapper.updateById(adminUser);
+        staffGroupService.updateById(adminGroup);
+        return adminUser;
+    }
+
+    /**
+     * 创建管理
+     *
+     * @param regionId            regionId
+     * @param schoolId            schoolId
+     * @param authorityTemplateId authorityTemplateId
+     * @param password            password
+     * @param contact             contact
+     * @return StaffModel
+     */
+    @Override
+    public StaffModel createAdminUserGroup(String regionId, String schoolId, String authorityTemplateId, String password, String contact) {
+        StaffGroupModel groupModel = this.createGroupModel(regionId, schoolId, authorityTemplateId);
+        return this.createAdminUserGroup(groupModel, password, contact);
     }
 
     /**
@@ -232,7 +249,8 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
      * @param authorityTemplateId authorityTemplate
      */
     private StaffModel createAdminUserGroup(String authorityTemplateId, RegionVo regionVo) {
-        return this.createAdminUserGroup(regionVo.getId(), regionVo.getSchoolId(), authorityTemplateId, regionVo.getPassword(), regionVo.getContact());
+        StaffGroupModel groupModel = this.createGroupModel(regionVo.getId(), regionVo.getSchoolId(), authorityTemplateId);
+        return this.createAdminUserGroup(groupModel, regionVo.getPassword(), regionVo.getContact());
     }
 
     /**
@@ -254,6 +272,7 @@ public class RegionServiceImpl extends NonIsolationBaseService<RegionMapper, Reg
         localDbModel.setRegionName(regionModel.getRegionName());
         localDbModel.setEducationName(regionModel.getEducationName());
         localDbModel.setDescription(regionModel.getDescription());
+        localDbModel.setAdminUserId(regionModel.getAdminUserId());
         this.updateById(localDbModel);
     }
 }
