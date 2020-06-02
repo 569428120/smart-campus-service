@@ -6,6 +6,7 @@ import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.NonIsolationBaseService;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
+import com.xzp.smartcampus.human.mapper.StaffMapper;
 import com.xzp.smartcampus.human.model.StaffModel;
 import com.xzp.smartcampus.human.service.IStaffUserService;
 import com.xzp.smartcampus.system.mapper.SchoolMapper;
@@ -35,10 +36,10 @@ import java.util.stream.Collectors;
 public class SchoolServiceImpl extends NonIsolationBaseService<SchoolMapper, SchoolModel> implements ISchoolService {
 
     @Resource
-    private IRegionService regionService;
+    private StaffMapper userMapper;
 
     @Resource
-    private IStaffUserService userService;
+    private IRegionService regionService;
 
     /**
      * 分页查询
@@ -67,7 +68,7 @@ public class SchoolServiceImpl extends NonIsolationBaseService<SchoolMapper, Sch
         if (CollectionUtils.isEmpty(schoolModels)) {
             return Collections.emptyList();
         }
-        List<StaffModel> staffModels = userService.selectByIds(schoolModels.stream().map(SchoolModel::getAdminUserId).collect(Collectors.toList()));
+        List<StaffModel> staffModels = userMapper.selectBatchIds(schoolModels.stream().map(SchoolModel::getAdminUserId).collect(Collectors.toList()));
         Map<String, StaffModel> userIdToModelMap = CollectionUtils.isEmpty(staffModels) ? Collections.emptyMap() : staffModels.stream().collect(Collectors.toMap(StaffModel::getId, v -> v));
         Set<String> regionIds = schoolModels.stream().map(SchoolModel::getRegionId).collect(Collectors.toSet());
         Map<String, RegionModel> regionIdToModelMap = this.getRegionIdToModelMap(regionIds);
@@ -127,9 +128,10 @@ public class SchoolServiceImpl extends NonIsolationBaseService<SchoolMapper, Sch
             this.insert(schoolVo);
             return schoolVo;
         }
+        StaffModel staffModel = regionService.updateAdminUser(schoolVo.getRegionId(), schoolVo.getId(), schoolVo.getAdminUserId(), schoolVo.getAuthorityTemplateId(), schoolVo.getPassword(), schoolVo.getContact());
+        schoolVo.setAdminUserId(staffModel.getId());
         // 更新操作
         this.updateSchool(schoolVo);
-        regionService.updateAdminUser(schoolVo.getRegionId(), schoolVo.getId(), schoolVo.getAdminUserId(), schoolVo.getAuthorityTemplateId(), schoolVo.getPassword(), schoolVo.getContact());
         return schoolVo;
     }
 
@@ -151,6 +153,7 @@ public class SchoolServiceImpl extends NonIsolationBaseService<SchoolMapper, Sch
         localDbModel.setAddress(schoolVo.getAddress());
         localDbModel.setContact(schoolVo.getContact());
         localDbModel.setDescription(schoolVo.getDescription());
+        localDbModel.setAdminUserId(schoolVo.getAdminUserId());
         this.updateById(localDbModel);
     }
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.utils.Constant;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.mapper.StaffMapper;
@@ -43,12 +44,43 @@ public class StaffServiceImpl extends IsolationBaseService<StaffMapper, StaffMod
         }
         Set<String> groupIds = data.stream().map(StaffModel::getGroupId).collect(Collectors.toSet());
         Map<String, StaffGroupModel> groupIdToModelMap = this.getGroupIdToModelMap(groupIds);
-        return data.stream().map(item->{
-            UserVo userVo  =new UserVo();
-            BeanUtils.copyProperties(item,userVo);
+        return data.stream().map(item -> {
+            UserVo userVo = new UserVo();
+            BeanUtils.copyProperties(item, userVo);
+            if (groupIdToModelMap.containsKey(item.getGroupId())) {
+                userVo.setGroupName(this.getTreePathNames(groupIdToModelMap.get(item.getGroupId()), groupIdToModelMap));
+            }
+            return userVo;
+        }).collect(Collectors.toList());
+    }
 
-            return
+    /**
+     * treepath转换名称
+     *
+     * @param groupModel        groupModel
+     * @param groupIdToModelMap groupIdToModelMap
+     * @return String
+     */
+    private String getTreePathNames(StaffGroupModel groupModel, Map<String, StaffGroupModel> groupIdToModelMap) {
+        if (groupModel == null) {
+            return "";
+        }
+        if (StringUtils.isBlank(groupModel.getTreePath())) {
+            return "";
+        }
+        List<String> names = new ArrayList<>(3);
+        Arrays.asList(groupModel.getTreePath().split(Constant.TREE_SEPARATOR)).forEach(id -> {
+            if (Constant.ROOT.equals(id)) {
+                return;
+            }
+            StaffGroupModel model = groupIdToModelMap.get(id);
+            if (model == null) {
+                names.add("已被删除");
+                return;
+            }
+            names.add(model.getGroupName());
         });
+        return String.join("/", names);
     }
 
     /**
@@ -65,14 +97,16 @@ public class StaffServiceImpl extends IsolationBaseService<StaffMapper, StaffMod
         if (CollectionUtils.isEmpty(groupModels)) {
             return Collections.emptyMap();
         }
-        List<String> pids = groupService.getNotFindPids(groupModels);
-        if (!CollectionUtils.isEmpty(pids)) {
-            List<StaffGroupModel> pGroupModels = groupService.selectByIds(pids);
-            if (!CollectionUtils.isEmpty(pGroupModels)) {
-                groupModels.addAll(pGroupModels);
+        List<String> treePaths = groupModels.stream().map(StaffGroupModel::getTreePath).collect(Collectors.toList());
+        List<String> ids = new ArrayList<>(treePaths.size());
+        treePaths.forEach(treePath -> {
+            if (StringUtils.isBlank(treePath)) {
+                return;
             }
-        }
-        return groupModels.stream().collect(Collectors.toMap(StaffGroupModel::getId, v -> v));
+            ids.addAll(Arrays.asList(treePath.split(Constant.TREE_SEPARATOR)));
+        });
+        List<StaffGroupModel> allModels = groupService.selectByIds(ids);
+        return allModels.stream().collect(Collectors.toMap(StaffGroupModel::getId, v -> v));
     }
 
     /**
@@ -105,6 +139,9 @@ public class StaffServiceImpl extends IsolationBaseService<StaffMapper, StaffMod
      */
     @Override
     public StaffModel postStaffUserModel(StaffModel staffModel) {
+        if (StringUtils.isBlank(staffModel.getUserName())) {
+            staffModel.setUserName(staffModel.getContact());
+        }
         if (StringUtils.isBlank(staffModel.getId())) {
             return this.insertStaffUserModel(staffModel);
         }
