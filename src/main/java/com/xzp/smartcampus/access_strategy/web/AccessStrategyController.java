@@ -4,6 +4,7 @@ package com.xzp.smartcampus.access_strategy.web;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyDetailModel;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyModel;
 import com.xzp.smartcampus.access_strategy.service.IAccessStrategyService;
+import com.xzp.smartcampus.common.vo.PageResult;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -24,15 +25,14 @@ public class AccessStrategyController {
      * @return
      */
     @GetMapping("/access-strategy/gets/page")
-    public ResponseEntity<List<AccessStrategyDetailModel>> selectStrategyByCondition(
+    public ResponseEntity<PageResult> selectStrategyByCondition(
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "status", required = false) String status
-//            @RequestParam(value = "current",defaultValue = "1") Integer current,
-//            @RequestParam(value = "pageSize",defaultValue = "15") Integer pageSize
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "current",defaultValue = "1") Integer current,
+            @RequestParam(value = "pageSize",defaultValue = "15") Integer pageSize
     ) {
-        List<AccessStrategyDetailModel> strategyDetailModels = this.strategyService.findStrategyByCondition(name, status);
 
-        return ResponseEntity.ok(strategyDetailModels);
+        return ResponseEntity.ok(this.strategyService.findStrategyByCondition(name, status,current,pageSize));
     }
 
     /**
@@ -40,7 +40,7 @@ public class AccessStrategyController {
      * @param strategyDetailModel
      * @return
      */
-    @PostMapping("/posts/strategy")
+    @PostMapping("/access-strategy/posts")
     public ResponseEntity<String> addAccessStrategy(@RequestBody AccessStrategyDetailModel strategyDetailModel){
         this.strategyService.createAccessStrategy(strategyDetailModel);
         return ResponseEntity.ok("New access strategy added successful!");

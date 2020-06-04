@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IAccessStrategyService extends IBaseService<AccessStrategyModel> {
 
-    List<AccessStrategyDetailModel> findStrategyByCondition(String name, String status);
+    PageResult findStrategyByCondition(String name, String status,Integer current,Integer pageSize);
 
     void createAccessStrategy(AccessStrategyDetailModel strategyDetailModel);
 
