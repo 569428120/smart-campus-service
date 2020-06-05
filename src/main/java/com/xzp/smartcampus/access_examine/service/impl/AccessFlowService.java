@@ -17,6 +17,8 @@ import com.xzp.smartcampus.access_examine.vo.FullExamineFlowInfo;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.model.BaseModel;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.human.model.StaffModel;
+import com.xzp.smartcampus.human.service.IStaffUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -35,7 +37,7 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
 
     // TODO 调用用户管理服务
     @Autowired
-    IUserService userService;
+    IStaffUserService userService;
     @Autowired
     IAccessFlowStepService stepService;
     @Autowired
@@ -65,16 +67,16 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
         BeanUtils.copyProperties(base, flowPoolModel);
         flowPoolModel.setFlowType(examineVo.getFlowType());
         // TODO 2.1 根据发起人id,查询发起人信息
-        SmartUser originator = this.userService.selectById(examineVo.getOriginatorId());
+        StaffModel originator = this.userService.selectById(examineVo.getOriginatorId());
         flowPoolModel.setOriginatorId(originator.getId());
         flowPoolModel.setOriginatorName(originator.getName());
-        flowPoolModel.setOriginatorCode(originator.getCode());
+        flowPoolModel.setOriginatorCode(originator.getUserJobCode());
         // TODO 2.2 根据申请人id,查询申请人信息
-        SmartUser applicant = this.userService.selectById(examineVo.getApplicantId());
+        StaffModel applicant = this.userService.selectById(examineVo.getApplicantId());
         flowPoolModel.setApplicantId(applicant.getId());
-        flowPoolModel.setApplicantType(applicant.getType());
+        flowPoolModel.setApplicantType(applicant.getUserType());
         flowPoolModel.setApplicantName(applicant.getName());
-        flowPoolModel.setApplicantCode(applicant.getCode());
+        flowPoolModel.setApplicantCode(applicant.getUserJobCode());
 
         // 3.创建流程步骤(暂时只包含两个步骤)
         // 3.1 步骤1>>>申请
@@ -84,21 +86,21 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
         flowStepModel_1.setStepName(FLowConst.APPLY);     //第一步骤创建完成,默认名称为 申请
         flowStepModel_1.setOpinion(examineVo.getReason());
         flowStepModel_1.setHandleId(applicant.getId());
-        flowStepModel_1.setHandleType(applicant.getType());
+        flowStepModel_1.setHandleType(applicant.getUserType());
         flowStepModel_1.setHandleName(applicant.getName());
-        flowStepModel_1.setHandleCode(applicant.getCode());
+        flowStepModel_1.setHandleCode(applicant.getUserJobCode());
         // 申请步骤创建完成,设置申请状态为完成
         flowStepModel_1.setHandleStatus(FLowConst.PENDING);
         // TODO 3.2 步骤2>>>审批
-        SmartUser examine = this.userService.selectById(examineVo.getExamineId());
+        StaffModel examine = this.userService.selectById(examineVo.getExamineId());
         AccessFlowStepModel flowStepModel_2 = new AccessFlowStepModel();
         //拷贝BaseModel属性
         BeanUtils.copyProperties(base, flowStepModel_2);
         flowStepModel_2.setStepName(FLowConst.EXAMINE);
         flowStepModel_2.setHandleId(examine.getId());
-        flowStepModel_2.setHandleType(examine.getType());
+        flowStepModel_2.setHandleType(examine.getUserType());
         flowStepModel_2.setHandleName(examine.getName());
-        flowStepModel_2.setHandleCode(examine.getCode());
+        flowStepModel_2.setHandleCode(examine.getUserJobCode());
         // TODO 保存操作不更新步骤状态
         // 审核步骤创建完成,设置审核状态为待审核
 //        flowStepModel_2.setHandleStatus(AccessConst.PENDING);
