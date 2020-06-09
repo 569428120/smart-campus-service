@@ -13,6 +13,8 @@ public class AccessStrategyModel extends BaseModel {
     private String strategyName;
     // 状态
     private String strategyStatus;
+    // 策略编码
+    private String strategyCode;
     // 描述信息
     private String description;
 }

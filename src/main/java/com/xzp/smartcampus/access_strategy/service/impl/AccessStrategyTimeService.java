@@ -1,5 +1,6 @@
 package com.xzp.smartcampus.access_strategy.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xzp.smartcampus.access_strategy.constconfig.AccessConst;
 import com.xzp.smartcampus.access_strategy.mapper.AccessStrategyTimeMapper;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyTimeModel;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,6 @@ public class AccessStrategyTimeService extends IsolationBaseService<AccessStrate
         strategyTimeModels.forEach(timeModel -> {
 
             if (timeModel.getAction().equals(AccessConst.ADD)) {
-                System.out.println(timeModel.getAction());
                 addTimeModels.add(timeModel);
             } else if (timeModel.getAction().equals(AccessConst.UPDATE)) {
                 upTimeModels.add(timeModel);
@@ -49,5 +50,13 @@ public class AccessStrategyTimeService extends IsolationBaseService<AccessStrate
 
     }
 
+    public List<AccessStrategyTimeModel> findStrategyPeriod(String strategyId){
+        if (StringUtils.isEmpty(strategyId)){
+            log.error("Id of strategy is null or empty!");
+            throw new SipException("Id of strategy is null or empty!");
+        }
+
+        return this.selectList(new QueryWrapper<AccessStrategyTimeModel>().like("strategy_id",strategyId));
+    }
 
 }
