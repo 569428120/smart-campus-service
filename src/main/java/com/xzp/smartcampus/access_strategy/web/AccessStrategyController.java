@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,8 +33,8 @@ public class AccessStrategyController {
      */
     @GetMapping("/access-strategy/gets/page")
     public ResponseEntity<PageResult> selectStrategyByCondition(
-            @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "strategyName", required = false) String name,
+            @RequestParam(value = "strategyStatus", required = false) String status,
             @RequestParam(value = "current",defaultValue = "1") Integer current,
             @RequestParam(value = "pageSize",defaultValue = "15") Integer pageSize
     ) {
@@ -57,7 +58,7 @@ public class AccessStrategyController {
      * @param timeModels
      * @return
      */
-    @PostMapping("/access-strategy/posts/period")
+    @PostMapping("/strategy-time-quantum/posts")
     public ResponseEntity<String> addAccessStrategy(@RequestBody List<AccessStrategyTimeModel> timeModels){
         this.timeService.insertBatch(timeModels);
         return ResponseEntity.ok("New strategy-time added successful!");
@@ -68,7 +69,7 @@ public class AccessStrategyController {
      * @param strategyIds
      * @return
      */
-    @DeleteMapping("/deletes/strategy")
+    @DeleteMapping("/access-strategy/deletes/deletes-by-ids")
     public ResponseEntity<String> deleteAccessStrategy(@RequestParam(value = "strategyIds",required = true) String strategyIds){
         this.strategyService.deleteStrategyByIds(Arrays.asList(strategyIds.split(",")));
         return ResponseEntity.ok("Strategys deleted successfully");
@@ -79,18 +80,18 @@ public class AccessStrategyController {
      * @param strategyModel
      * @return
      */
-    @PutMapping("/puts/strategy")
+    @PostMapping("/access-strategy/status/posts")
     public ResponseEntity<String> modifyAccessStrategy(@RequestBody AccessStrategyModel strategyModel){
         this.strategyService.updateById(strategyModel);
         return ResponseEntity.ok("Strategy modified successfully");
     }
 
     /**
-     * 更新策略下的 策略-时间段 数据,合并增删改
-     * @param strategyTimeModels
+     * 更新策略下的 策略-时间段 数据,合并增改
+     * @param strategyTimeModels 时间段 Model
      * @return
      */
-    @PostMapping("/posts/strategy-time")
+    @PostMapping("/strategy-time-quantum/posts")
     public ResponseEntity<String> modifyAccessStrategyTime(@RequestBody List<AccessStrategyTimeModel> strategyTimeModels){
         if(CollectionUtils.isEmpty(strategyTimeModels)){
             throw new SipException("StrategyTimeModels is null!");
@@ -100,18 +101,27 @@ public class AccessStrategyController {
         return ResponseEntity.ok("Strategy-Time modified successfully");
     }
 
-
     /**
-     * 查询策略对应的时间段
+     * 查询时间段
      * @param strategyId 策略id
      * @return
      */
-    @GetMapping("/access-strategy/gets/period")
+    @GetMapping("/strategy-time-quantum/gets/gets-by-strategyid")
     public ResponseEntity<List> selectStrategyPeriod(@RequestParam(value = "strategyId",required = true) String strategyId){
 
         return ResponseEntity.ok(this.timeService.findStrategyPeriod(strategyId));
     }
 
+    /**
+     * 删除时间段(批量)
+     * @param ids   时间段id列表
+     * @return
+     */
+    @GetMapping("/strategy-time-quantum/deletes/deletes-by-ids")
+    public ResponseEntity<String> deleteStrategyPeriod(@RequestParam(value ="ids",required = true) String ids){
+        this.timeService.deleteByIds(Arrays.asList(ids.split(",")));
+        return ResponseEntity.ok(MessageFormat.format("Strategy time-models :{0} have been deleted",ids));
+    }
 
 }
 

@@ -23,31 +23,23 @@ public class AccessStrategyTimeService extends IsolationBaseService<AccessStrate
         implements IAccessStrategyTimeService {
 
     public void modifyAccessStrategyTime(List<AccessStrategyTimeModel> strategyTimeModels) {
-        // 1.根据策略-时间段 model提供的action,将model分为三组,新增,更新,删除
+        // 1.根据策略-时间段 model提供的action,将model分为两组,新增,更新
         List<AccessStrategyTimeModel> addTimeModels = new ArrayList<>();
         List<AccessStrategyTimeModel> upTimeModels = new ArrayList<>();
-        List<String> delTimeModelIds = new ArrayList<>();
         strategyTimeModels.forEach(timeModel -> {
-
-            if (timeModel.getAction().equals(AccessConst.ADD)) {
+            if (StringUtils.isEmpty(timeModel.getId())) {
                 addTimeModels.add(timeModel);
-            } else if (timeModel.getAction().equals(AccessConst.UPDATE)) {
+            } else{
                 upTimeModels.add(timeModel);
-            } else if (timeModel.getAction().equals(AccessConst.DELETE)) {
-                delTimeModelIds.add(timeModel.getId());
             }
         });
-        // 2.根据分组进行相应的增删改操作
+        // 2.根据分组进行相应的增改操作
         if (!CollectionUtils.isEmpty(addTimeModels)) {
             this.insertBatch(addTimeModels);
         }
         if (!CollectionUtils.isEmpty(upTimeModels)) {
             this.updateBatch(upTimeModels);
         }
-        if (!CollectionUtils.isEmpty(delTimeModelIds)) {
-            this.deleteByIds(delTimeModelIds);
-        }
-
     }
 
     public List<AccessStrategyTimeModel> findStrategyPeriod(String strategyId){
