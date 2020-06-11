@@ -18,6 +18,11 @@ public class AccessStrategyCtrlController {
     @Resource
     IAccessStrategyControlService controlService;
 
+    /**
+     *
+     * @param controlModel
+     * @return
+     */
     @PostMapping("/posts")
     public ResponseEntity<String> createStrategyControl(@RequestBody AccessStrategyControlModel controlModel){
         this.controlService.insert(controlModel);

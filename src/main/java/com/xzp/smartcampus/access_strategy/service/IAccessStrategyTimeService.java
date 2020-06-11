@@ -8,4 +8,6 @@ import java.util.List;
 public interface IAccessStrategyTimeService extends IBaseService<AccessStrategyTimeModel> {
 
     void modifyAccessStrategyTime(List<AccessStrategyTimeModel> strategyTimeModels);
+
+    List<AccessStrategyTimeModel> findStrategyPeriod(String strategyId);
 }

@@ -1,6 +1,5 @@
 package com.xzp.smartcampus.access_strategy.service;
 
-import com.xzp.smartcampus.access_strategy.model.AccessStrategyDetailModel;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyModel;
 import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.common.vo.PageResult;
@@ -11,7 +10,5 @@ public interface IAccessStrategyService extends IBaseService<AccessStrategyModel
 
     PageResult findStrategyByCondition(String name, String status,Integer current,Integer pageSize);
 
-    void createAccessStrategy(AccessStrategyDetailModel strategyDetailModel);
-
-    void deleteStrategyById(String id);
+    void deleteStrategyByIds(List<String> ids);
 }
