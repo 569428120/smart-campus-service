@@ -7,7 +7,13 @@ import java.util.List;
 
 public interface IAccessStrategyTimeService extends IBaseService<AccessStrategyTimeModel> {
 
-    void modifyAccessStrategyTime(List<AccessStrategyTimeModel> strategyTimeModels);
-
     List<AccessStrategyTimeModel> findStrategyPeriod(String strategyId);
+
+    /**
+     * 保存时间段
+     *
+     * @param strategyTimeModel strategyTimeModel
+     * @return AccessStrategyTimeModel
+     */
+    AccessStrategyTimeModel saveAccessStrategyTime(AccessStrategyTimeModel strategyTimeModel);
 }

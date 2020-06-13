@@ -1,5 +1,7 @@
 package com.xzp.smartcampus.access_strategy.model;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
@@ -16,5 +18,6 @@ public class AccessStrategyModel extends BaseModel {
     // 策略编码
     private String strategyCode;
     // 描述信息
+    @TableField(strategy = FieldStrategy.IGNORED)
     private String description;
 }

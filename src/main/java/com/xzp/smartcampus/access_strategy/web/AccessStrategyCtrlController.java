@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
-@Controller
+@RestController
 @RequestMapping("/strategy-control")
 @Slf4j
 public class AccessStrategyCtrlController {
@@ -19,34 +19,24 @@ public class AccessStrategyCtrlController {
     IAccessStrategyControlService controlService;
 
     /**
-     *
      * @param controlModel
      * @return
      */
     @PostMapping("/posts")
-    public ResponseEntity<String> createStrategyControl(@RequestBody AccessStrategyControlModel controlModel){
+    public ResponseEntity<String> createStrategyControl(@RequestBody AccessStrategyControlModel controlModel) {
         this.controlService.insert(controlModel);
         return ResponseEntity.ok("Strategy control created successfully!");
     }
 
     @DeleteMapping("/deletes")
-    public ResponseEntity<String> deleteStrategyControl(@RequestParam(value = "id",required = true) String id){
-        if(StringUtils.isEmpty(id)){
+    public ResponseEntity<String> deleteStrategyControl(@RequestParam(value = "id", required = true) String id) {
+        if (StringUtils.isEmpty(id)) {
             log.error("Strategy control id: %s is empty!");
             throw new SipException("Strategy control id: %s is empty!");
         }
         this.controlService.deleteById(id);
         return ResponseEntity.ok("Strategy control deleted successfully!");
     }
-
-
-
-
-
-
-
-
-
 
 
 }

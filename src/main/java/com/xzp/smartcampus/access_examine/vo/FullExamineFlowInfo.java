@@ -4,6 +4,7 @@ import com.xzp.smartcampus.access_examine.model.AccessFlowPoolModel;
 import com.xzp.smartcampus.access_examine.model.AccessFlowStepModel;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * 单个流程业务对应的全量信息
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class FullExamineFlowInfo  extends BaseModel {
     // 业务本身信息
     private String flowId;
