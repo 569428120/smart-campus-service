@@ -118,8 +118,21 @@ public class StaffServiceImpl extends IsolationBaseService<StaffMapper, StaffMod
      * @return PageResult<StaffModel>
      */
     private PageResult<StaffModel> getStaffModelPage(StaffModel searchValue, Integer current, Integer pageSize) {
+        List<String> groupIds = null;
+        if (StringUtils.isNotBlank(searchValue.getGroupId())) {
+            Collections.singletonList("-1") Collections.singletonList("-1");
+            StaffGroupModel groupModel = groupService.selectById(searchValue.getGroupId());
+            if (groupModel != null) {
+                List<StaffGroupModel> groupModels = groupService.selectList(new QueryWrapper<StaffGroupModel>()
+                        .likeLeft("tree_path", groupModel.getTreePath())
+                );
+                if (!CollectionUtils.isEmpty(groupModels)) {
+                    groupIds = groupModels.stream().map(StaffGroupModel::getId).collect(Collectors.toList());
+                }
+            }
+        }
         QueryWrapper<StaffModel> wrapper = new QueryWrapper<>();
-        wrapper.eq(StringUtils.isNotBlank(searchValue.getGroupId()), "group_id", searchValue.getGroupId());
+        wrapper.in("group_id", groupIds);
         wrapper.eq(StringUtils.isNotBlank(searchValue.getUserType()), "user_type", searchValue.getUserType());
         if (StringUtils.isNotBlank(searchValue.getUserIdentity())) {
             wrapper.and(qw -> qw.like("user_identity", searchValue.getUserIdentity())
