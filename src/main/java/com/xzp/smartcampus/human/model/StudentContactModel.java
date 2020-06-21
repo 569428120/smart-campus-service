@@ -43,9 +43,5 @@ public class StudentContactModel extends BaseModel {
     private String name;
 
     //`certificate` varchar(255) DEFAULT NULL COMMENT '证件号码',  identity
-    private String certificate;
-
-    //`occupation` varchar(64) DEFAULT NULL COMMENT '职业',
-    private String occupation;
-
+    private String contact;
 }

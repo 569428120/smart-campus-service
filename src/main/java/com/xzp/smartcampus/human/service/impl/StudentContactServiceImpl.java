@@ -1,53 +1,43 @@
 package com.xzp.smartcampus.human.service.impl;
 
-import com.xzp.smartcampus.common.exception.SipException;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.human.mapper.StudentContactMapper;
 import com.xzp.smartcampus.human.model.StudentContactModel;
-import com.xzp.smartcampus.human.model.StudentModel;
-import com.xzp.smartcampus.human.service.StudentContactService;
+import com.xzp.smartcampus.human.service.IStudentContactService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
 @Slf4j
-public class StudentContactServiceImpl
-        extends IsolationBaseService<StudentContactMapper, StudentContactModel>
-        implements StudentContactService {
+public class StudentContactServiceImpl extends IsolationBaseService<StudentContactMapper, StudentContactModel> implements IStudentContactService {
 
     /**
-     * 新增一个联系人信息
-     * @param contact
+     * 保存联系人
+     *
+     * @param contactList 联系人列表
+     * @param studentId   学生id
      */
-    public StudentContactModel addContact(StudentContactModel contact) {
-
-        return null;
+    @Override
+    public void saveStudentContact(List<StudentContactModel> contactList, String studentId) {
+        if (CollectionUtils.isEmpty(contactList) || StringUtils.isEmpty(studentId)) {
+            log.warn("contactList or studentId is null");
+            return;
+        }
+        this.delete(new UpdateWrapper<StudentContactModel>()
+                .eq("student_id", studentId)
+        );
+        contactList.forEach(item -> {
+            item.setId(SqlUtil.getUUId());
+            item.setStudentId(studentId);
+        });
+        this.insertBatch(contactList);
     }
-
-    /* 删除一个联系人信息 */
-    public StudentContactModel delContact(StudentContactModel contact) {
-        return null;
-    }
-
-
-    /* 修改一个联系人信息 */
-    public StudentContactModel changeContact(StudentContactModel contact) {
-        return null;
-    }
-
-
-    /* 查询学生相关的所有联系人的信息 */
-    public List<StudentContactModel> getContactsByStudentId(String sid) {
-        return null;
-    }
-
-
-
-
 }

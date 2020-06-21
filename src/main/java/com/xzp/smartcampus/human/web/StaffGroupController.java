@@ -42,7 +42,7 @@ public class StaffGroupController {
     /**
      * 删除数据
      *
-     * @param menuIds menuIds
+     * @param groupIds menuIds
      * @return ResponseEntity<String>
      */
     @GetMapping("/deletes/deletes-by-ids")
@@ -91,6 +91,17 @@ public class StaffGroupController {
                                                    @RequestParam(value = "targetId", defaultValue = "") String targetId) {
         groupService.moveUserToGroups(Arrays.asList(userIds.split(",")), targetId);
         return ResponseEntity.ok("操作成功");
+    }
+
+    /**
+     * 根据id获取分组信息
+     *
+     * @param groupId 分组id
+     * @return StaffGroupModel
+     */
+    @GetMapping("/gets/gets-by-id")
+    public ResponseEntity<StaffGroupModel> getStaffGroupModelById(@RequestParam(value = "groupId") String groupId) {
+        return ResponseEntity.ok(groupService.selectById(groupId));
     }
 
 }

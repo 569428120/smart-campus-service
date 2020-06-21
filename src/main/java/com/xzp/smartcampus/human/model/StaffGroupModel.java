@@ -52,6 +52,11 @@ public class StaffGroupModel extends BaseModel {
     //`authority_id` varchar(32) DEFAULT NULL COMMENT '权限组id',
     private String authorityId;
 
+    /**
+     * 门禁策略id
+     */
+    private String accessStrategyId;
+
     //`description` varchar(255) DEFAULT NULL COMMENT '描述',
     @TableField(strategy = FieldStrategy.IGNORED)
     private String description;

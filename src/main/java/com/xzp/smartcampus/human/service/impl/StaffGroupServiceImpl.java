@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
 import com.xzp.smartcampus.common.utils.Constant;
+import com.xzp.smartcampus.common.utils.DataUtil;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.utils.TreeUtil;
 import com.xzp.smartcampus.human.mapper.StaffGroupMapper;
@@ -113,6 +114,7 @@ public class StaffGroupServiceImpl extends IsolationBaseService<StaffGroupMapper
             throw new SipException("参数错误，找不到更新对象 id " + groupModel.getId());
         }
         localModel.setAuthorityId(groupModel.getAuthorityId());
+        localModel.setAccessStrategyId(groupModel.getAccessStrategyId());
         localModel.setGroupName(groupModel.getGroupName());
         localModel.setDescription(groupModel.getDescription());
         this.updateById(localModel);
@@ -180,7 +182,7 @@ public class StaffGroupServiceImpl extends IsolationBaseService<StaffGroupMapper
             });
         });
         // 安装treePath的长度排序
-        sourceChildrenList.sort(Comparator.comparingInt(o -> this.getTreePathNumber(o.getTreePath())));
+        sourceChildrenList.sort(Comparator.comparingInt(o -> DataUtil.getTreePathNumber(o.getTreePath())));
         targetGroupModels.forEach(sModel -> {
             sourceChildrenList.forEach(item -> {
                 StaffGroupModel pModel = sourceIdAndPidToCopyModelMap.get(item.getPid() + sModel.getId());
@@ -200,19 +202,6 @@ public class StaffGroupServiceImpl extends IsolationBaseService<StaffGroupMapper
         if (!CollectionUtils.isEmpty(sourceIdAndPidToCopyModelMap)) {
             this.insertBatch(sourceIdAndPidToCopyModelMap.values());
         }
-    }
-
-    /**
-     * treePath  截取的长度
-     *
-     * @param treePath treePath
-     * @return int
-     */
-    private int getTreePathNumber(String treePath) {
-        if (StringUtils.isBlank(treePath)) {
-            return 0;
-        }
-        return treePath.split(Constant.TREE_SEPARATOR).length;
     }
 
     /**
@@ -269,7 +258,7 @@ public class StaffGroupServiceImpl extends IsolationBaseService<StaffGroupMapper
             item.setTreePath(targetGroupModel.getTreePath() + Constant.TREE_SEPARATOR + item.getId());
             idToMoveModelMap.put(item.getId(), item);
         });
-        sourceChildrenList.sort(Comparator.comparingInt(o -> this.getTreePathNumber(o.getTreePath())));
+        sourceChildrenList.sort(Comparator.comparingInt(o -> DataUtil.getTreePathNumber(o.getTreePath())));
         sourceChildrenList.forEach(item -> {
             StaffGroupModel pModel = idToMoveModelMap.get(item.getPid());
             if (pModel == null) {

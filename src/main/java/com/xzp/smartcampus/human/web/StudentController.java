@@ -1,50 +1,72 @@
 package com.xzp.smartcampus.human.web;
 
+import com.xzp.smartcampus.common.exception.SipException;
+import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.StudentModel;
-import com.xzp.smartcampus.human.service.StudentService;
+import com.xzp.smartcampus.human.service.IStudentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Random;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/human/student")
 public class StudentController {
 
     @Resource
-    private StudentService studentService;
+    private IStudentService studentService;
 
-    /* 单个学生的CRUD */
-    //按照学生号，获取一个学生的信息
-    @GetMapping("/")
-    public ResponseEntity<StudentModel> queryByid(@RequestParam(value = "id", defaultValue = "") String id){
-        StudentModel student = studentService.selectById(id);
-        return ResponseEntity.ok(student);
+    /**
+     * 分页查询
+     *
+     * @param searchValue 搜索条件
+     * @param current     当前页
+     * @param pageSize    页数量
+     * @return ResponseEntity<PageResult>
+     */
+    @GetMapping("/gets/page")
+    public ResponseEntity<PageResult> getStudentVoListPage(StudentModel searchValue,
+                                                           @RequestParam(value = "current") Integer current,
+                                                           @RequestParam(value = "pageSize") Integer pageSize) {
+        return ResponseEntity.ok(studentService.getStudentVoListPage(searchValue, current, pageSize));
     }
-    // 新建一个学生的信息
-    @PostMapping("/")
-    public ResponseEntity<StudentModel> addStudent(@RequestBody StudentModel studentModel){
-        return ResponseEntity.ok(studentService.addStudent(studentModel));
+
+    /**
+     * 修改或新增方法
+     *
+     * @param studentModel 数据
+     * @return ResponseEntity<StaffModel>
+     */
+    @PostMapping("/posts")
+    public ResponseEntity<StudentModel> postStudentModel(@RequestBody StudentModel studentModel) {
+        return ResponseEntity.ok(studentService.postStudentModel(studentModel));
     }
-    // 改变一个学生的信息
-    @PutMapping("/")
-    @PatchMapping("/")
-    public ResponseEntity<StudentModel> changeByid(@RequestBody StudentModel studentModel){
-        return ResponseEntity.ok(studentService.changeStudent(studentModel));
-    }
-    // 删除一个学生的信息
-    @DeleteMapping("/")
-    public ResponseEntity<String> deleteByid(@RequestParam(value = "id", defaultValue = "") String id){
-        StudentModel student = studentService.selectById(id);
-        if (student == null){
-            return ResponseEntity.ok("该学生信息不存在");
+
+    /**
+     * 校验数据
+     *
+     * @param studentModel studentModel
+     * @return String
+     */
+    @PostMapping("/validator")
+    public ResponseEntity<String> validatorStudentModel(@RequestBody StudentModel studentModel) {
+        try {
+            studentService.validatorStudentModel(studentModel);
+        } catch (SipException e) {
+            return ResponseEntity.ok(e.getMessage());
         }
-        studentService.deleteById(id);
         return ResponseEntity.ok("");
     }
 
-    /* 学生 批量 CRUD 暂时不需要 */
+    /**
+     * @param studentIds studentIds
+     * @return ResponseEntity<String>
+     */
+    @GetMapping("/deletes/deletes-by-ids")
+    public ResponseEntity<String> deleteBatchByIds(@RequestParam(value = "studentIds", defaultValue = "") String studentIds) {
+        studentService.deleteByIds(Arrays.asList(studentIds.split(",")));
+        return ResponseEntity.ok("删除成功");
+    }
 
 }

@@ -1,5 +1,7 @@
 package com.xzp.smartcampus.human.model;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
 import lombok.Data;
@@ -40,6 +42,8 @@ public class StudentModel extends BaseModel {
 
     //`student_code` varchar(64) DEFAULT NULL COMMENT '学号',
     private String studentCode;
+
     //`address` varchar(255) DEFAULT NULL COMMENT '家庭住址',
+    @TableField(strategy = FieldStrategy.IGNORED)
     private String address;
 }

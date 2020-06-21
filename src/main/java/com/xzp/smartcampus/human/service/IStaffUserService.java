@@ -6,6 +6,8 @@ import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.StaffModel;
 import com.xzp.smartcampus.human.vo.UserVo;
 
+import java.util.List;
+
 /**
  * 员工信息系统
  */
@@ -28,4 +30,12 @@ public interface IStaffUserService extends IBaseService<StaffModel> {
      * @return StaffModel
      */
     StaffModel postStaffUserModel(StaffModel staffModel);
+
+    /**
+     * 根据id获取用户vo
+     *
+     * @param userIds userIds
+     * @return List<UserVo>
+     */
+    List<UserVo> getUserVoListByIds(List<String> userIds);
 }

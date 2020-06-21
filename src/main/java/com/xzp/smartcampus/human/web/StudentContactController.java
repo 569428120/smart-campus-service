@@ -1,39 +1,22 @@
 package com.xzp.smartcampus.human.web;
 
-import com.xzp.smartcampus.human.model.StudentContactModel;
-import com.xzp.smartcampus.human.service.StudentContactService;
+import com.xzp.smartcampus.human.service.IStudentContactService;
+import com.xzp.smartcampus.human.vo.StudentContactPostVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @RestController
-@RequestMapping("/human/student/contact")
+@RequestMapping("/human/student-contact")
 public class StudentContactController {
 
     @Resource
-    private StudentContactService studentContactService;
+    private IStudentContactService studentContactService;
 
-    /* ********************** 员工的联系人 CRUD ********************** */
-
-    /** 按照id 查询全部的联系人
-     * @param id  对象id
-     * */
-    @GetMapping("/")
-    public ResponseEntity<List<StudentContactModel>> getContactsById(@RequestParam(value = "id", defaultValue = "") String id){
-
-        return ResponseEntity.ok(studentContactService.getContactsByStudentId(id));
+    @PostMapping("/posts")
+    public ResponseEntity<String> saveStudentContact(@RequestBody StudentContactPostVo postVo) {
+        studentContactService.saveStudentContact(postVo.getContactList(), postVo.getStudentId());
+        return ResponseEntity.ok("保存成功");
     }
-
-      /** 给指定id 的对象，增加一个联系人
-       * */
-      @PostMapping("/")
-      public ResponseEntity<StudentContactModel> addContact(@RequestBody StudentContactModel contact){
-          return ResponseEntity.ok(studentContactService.addContact(contact));
-      }
-
-
-
-
 }
