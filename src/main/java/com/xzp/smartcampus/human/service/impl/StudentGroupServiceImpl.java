@@ -9,11 +9,13 @@ import com.xzp.smartcampus.common.utils.DataUtil;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.utils.TreeUtil;
 import com.xzp.smartcampus.human.mapper.StudentGroupMapper;
+import com.xzp.smartcampus.human.model.StaffGroupModel;
 import com.xzp.smartcampus.human.model.StudentGroupModel;
 import com.xzp.smartcampus.human.model.StudentModel;
 import com.xzp.smartcampus.human.service.IStudentGroupService;
 import com.xzp.smartcampus.human.service.IStudentService;
 import com.xzp.smartcampus.human.vo.StudentGroupTreeVo;
+import com.xzp.smartcampus.human.vo.UserGroupTreeVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -41,6 +43,21 @@ public class StudentGroupServiceImpl extends IsolationBaseService<StudentGroupMa
      */
     @Override
     public List<StudentGroupTreeVo> getStudentGroupVoTreeList(StudentGroupModel searchValue) {
+        List<StudentGroupModel> groupModels = this.getStudentGroupModelList(searchValue);
+        if (CollectionUtils.isEmpty(groupModels)) {
+            return Collections.emptyList();
+        }
+        // 转为树结构
+        return TreeUtil.modelToTreeVo(groupModels, new StudentGroupTreeVo());
+    }
+
+    /**
+     * 查询model
+     *
+     * @param searchValue searchValue
+     * @return List<StudentGroupModel>
+     */
+    private List<StudentGroupModel> getStudentGroupModelList(StudentGroupModel searchValue) {
         List<StudentGroupModel> groupModels = this.selectList(new QueryWrapper<StudentGroupModel>()
                 .like(StringUtils.isNotBlank(searchValue.getGroupName()), "group_name", searchValue.getGroupName())
                 .orderByAsc("create_time")
@@ -59,9 +76,9 @@ public class StudentGroupServiceImpl extends IsolationBaseService<StudentGroupMa
                 groupModels.addAll(pModels);
             }
         }
-        // 转为树结构
-        return TreeUtil.modelToTreeVo(groupModels, new StudentGroupTreeVo());
+        return groupModels;
     }
+
 
     /**
      * 删除学生分组
@@ -341,6 +358,28 @@ public class StudentGroupServiceImpl extends IsolationBaseService<StudentGroupMa
             item.setGroupId(targetGroupModel.getId());
         });
         studentService.updateBatch(userModels);
+    }
+
+    /**
+     * 返回班级树结构
+     *
+     * @param searchValue searchValue
+     * @return List<UserGroupTreeVo>
+     */
+    @Override
+    public List<UserGroupTreeVo> getUserGroupTreeList(UserGroupTreeVo searchValue) {
+        StudentGroupModel searchModel = new StudentGroupModel();
+        searchModel.setGroupName(searchValue.getGroupName());
+        searchModel.setGroupCode(searchValue.getGroupCode());
+        List<StudentGroupModel> studentGroupModels = this.getStudentGroupModelList(searchModel);
+        if (CollectionUtils.isEmpty(studentGroupModels)) {
+            return Collections.emptyList();
+        }
+        return TreeUtil.modelToTreeVo(studentGroupModels.stream().map(item -> {
+            StaffGroupModel groupModel = new StaffGroupModel();
+            BeanUtils.copyProperties(item, groupModel);
+            return groupModel;
+        }).collect(Collectors.toList()), new UserGroupTreeVo());
     }
 
     /**

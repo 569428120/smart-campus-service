@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xzp.smartcampus.common.model.BaseModel;
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
+import com.xzp.smartcampus.portal.vo.RegionInfo;
+import com.xzp.smartcampus.portal.vo.SchoolInfo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
@@ -50,12 +52,24 @@ public class IsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> 
         if (userInfo == null) {
             return "";
         }
-        return "(" +
-                "region_id" + ((StringUtils.isBlank(userInfo.getRegionId()) ? " is null" : (" = '" + userInfo.getRegionId()) + "'")) +
-                " AND " +
-                "school_id" + ((StringUtils.isBlank(userInfo.getSchoolId()) ? " is null" : (" = '" + userInfo.getSchoolId()) + "'")) +
-                ")" +
-                " AND ";
+        RegionInfo regionInfo = userInfo.getCurrRegionInfo();
+        SchoolInfo schoolInfo = userInfo.getCurrSchoolInfo();
+        StringBuilder sb = new StringBuilder();
+        sb.append("( ");
+        if (regionInfo != null) {
+            sb.append("region_id = '").append(regionInfo.getRegionId()).append("'");
+        } else {
+            sb.append("region_id is null");
+        }
+        sb.append(" AND ");
+        if (schoolInfo != null) {
+            sb.append("school_id = '").append(schoolInfo.getSchoolId()).append("'");
+        } else {
+            sb.append("school_id is null");
+        }
+        sb.append(" )");
+        sb.append(" AND ");
+        return sb.toString();
     }
 
     /**
@@ -77,11 +91,13 @@ public class IsolationBaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     protected void initTenant(T model, LoginUserInfo userInfo) {
-        if (StringUtils.isBlank(model.getRegionId())) {
-            model.setRegionId(userInfo.getRegionId());
+        RegionInfo regionInfo = userInfo.getCurrRegionInfo();
+        SchoolInfo schoolInfo = userInfo.getCurrSchoolInfo();
+        if (regionInfo != null && StringUtils.isBlank(model.getRegionId())) {
+            model.setRegionId(regionInfo.getRegionId());
         }
-        if (StringUtils.isBlank(model.getSchoolId())) {
-            model.setSchoolId(userInfo.getSchoolId());
+        if (schoolInfo != null && StringUtils.isBlank(model.getSchoolId())) {
+            model.setSchoolId(schoolInfo.getSchoolId());
         }
     }
 

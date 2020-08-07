@@ -4,6 +4,7 @@ import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.CardModel;
 import com.xzp.smartcampus.human.vo.FeatureCardVo;
+import com.xzp.smartcampus.human.vo.IFeatureVo;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface IFeatureCardService extends IBaseService<CardModel> {
      * @param pageSize    页数量
      * @return List<FeatureCardVo>
      */
-    PageResult<FeatureCardVo> getFeatureCardVoList(FeatureCardVo searchValue, Integer current, Integer pageSize);
+    PageResult<IFeatureVo> getFeatureCardVoList(FeatureCardVo searchValue, Integer current, Integer pageSize);
 
     /**
      * 保存卡信息
@@ -33,4 +34,11 @@ public interface IFeatureCardService extends IBaseService<CardModel> {
      * @param cardIds cardIds
      */
     void deleteCardByIds(List<String> cardIds);
+
+    /**
+     * 校验数据
+     *
+     * @param cardModel cardModel
+     */
+    void validatorCardModel(CardModel cardModel);
 }

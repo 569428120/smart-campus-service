@@ -18,7 +18,7 @@ public interface IAuthService {
      * @param code     验证码
      * @return String
      */
-    Map<String, String> userLogin(String userName, String password, String code);
+    Map<String, Object> userLogin(String userName, String password, String code);
 
     /**
      * 根据token获取用户信息

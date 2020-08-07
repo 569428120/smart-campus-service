@@ -3,7 +3,7 @@ package com.xzp.smartcampus.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xzp.smartcampus.common.exception.SipException;
-import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.service.NonIsolationBaseService;
 import com.xzp.smartcampus.common.utils.Constant;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.utils.TreeUtil;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * 菜单共有方法
  */
 @Slf4j
-public abstract class BaseMenuService extends IsolationBaseService<MenuMapper, MenuModel> {
+public abstract class BaseMenuService extends NonIsolationBaseService<MenuMapper, MenuModel> {
 
     /**
      * 获取菜单类型

@@ -2,6 +2,7 @@ package com.xzp.smartcampus.human.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.xzp.smartcampus.common.enums.UserType;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
 import com.xzp.smartcampus.common.utils.Constant;
@@ -15,6 +16,7 @@ import com.xzp.smartcampus.human.service.IStudentContactService;
 import com.xzp.smartcampus.human.service.IStudentGroupService;
 import com.xzp.smartcampus.human.service.IStudentService;
 import com.xzp.smartcampus.human.vo.StudentVo;
+import com.xzp.smartcampus.human.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -250,6 +252,102 @@ public class StudentServiceImpl extends IsolationBaseService<StudentMapper, Stud
             return Collections.emptyList();
         }
         return this.toStudentVoList(studentModels);
+    }
+
+    /**
+     * 分页查询，转换为UserVo对象
+     *
+     * @param searchValue searchValue
+     * @param groupId     groupId
+     * @param current     current
+     * @param pageSize    pageSize
+     * @return PageResult<UserVo>
+     */
+    @Override
+    public PageResult<UserVo> getUserVoPage(UserVo searchValue, String groupId, Integer current, Integer pageSize) {
+        StudentModel searchModel = new StudentModel();
+        BeanUtils.copyProperties(searchValue, searchModel);
+        searchModel.setGroupId(groupId);
+        PageResult<StudentVo> pageResult = this.getStudentVoListPage(searchModel, current, pageSize);
+        return new PageResult<>(pageResult.getTotal(), pageResult.getTotalPage(), this.studentVoListToUserVoList(pageResult.getData()));
+    }
+
+    /**
+     * 转换为userVo
+     *
+     * @param studentVos studentVos
+     * @return List<UserVo>
+     */
+    private List<UserVo> studentVoListToUserVoList(List<StudentVo> studentVos) {
+        if (CollectionUtils.isEmpty(studentVos)) {
+            return Collections.emptyList();
+        }
+        return studentVos.stream().map(item -> {
+            UserVo vo = new UserVo();
+            BeanUtils.copyProperties(item, vo);
+            vo.setUserJobCode(item.getStudentCode());
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 获得家长列表
+     *
+     * @param searchValue searchValue
+     * @param groupId     groupId
+     * @param current     current
+     * @param pageSize    pageSize
+     * @return PageResult<UserVo>
+     */
+    @Override
+    public PageResult<UserVo> getParentUserVoPage(UserVo searchValue, String groupId, Integer current, Integer pageSize) {
+        List<String> groupIds = this.getGroupIds(groupId);
+        List<StudentModel> studentModels = this.selectList(new QueryWrapper<StudentModel>()
+                .in(!CollectionUtils.isEmpty(groupIds), "group_id", groupIds)
+        );
+        if (CollectionUtils.isEmpty(studentModels)) {
+            return PageResult.emptyPageResult();
+        }
+        List<String> studentIds = studentModels.stream().map(StudentModel::getId).collect(Collectors.toList());
+        PageResult<StudentContactModel> pageResult = contactService.selectPage(new Page<>(current, pageSize), new QueryWrapper<StudentContactModel>()
+                .in("student_id", studentIds)
+                .like(StringUtils.isNotBlank(searchValue.getName()), "name", searchValue.getName())
+        );
+        return new PageResult<>(pageResult.getTotal(), pageResult.getTotalPage(), this.contactListToUserVoList(pageResult.getData()));
+    }
+
+    /**
+     * 根据用户id获得家长列表
+     *
+     * @param userIds userIds
+     * @return List<UserVo>
+     */
+    @Override
+    public List<UserVo> getParentUserVoListByIds(List<String> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            log.info("userIds is null");
+            return Collections.emptyList();
+        }
+        List<StudentContactModel> contactModels = contactService.selectByIds(userIds);
+        return this.contactListToUserVoList(contactModels);
+    }
+
+    /**
+     * 联系人转换为userVo
+     *
+     * @param contactModels contactModels
+     * @return List<UserVo>
+     */
+    private List<UserVo> contactListToUserVoList(List<StudentContactModel> contactModels) {
+        if (CollectionUtils.isEmpty(contactModels)) {
+            return Collections.emptyList();
+        }
+        return contactModels.stream().map(item -> {
+            UserVo vo = new UserVo();
+            BeanUtils.copyProperties(item, vo);
+            vo.setUserType(UserType.PARENT.getKey());
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     /**

@@ -1,8 +1,15 @@
 package com.xzp.smartcampus.common.enums;
 
+/**
+ * @author xuzhipeng
+ */
 public enum UserType {
+    /**
+     * 用户类型枚举
+     */
     STUDENT("Student", "学生"),
     TEACHER("Teacher", "教师"),
+    PARENT("Parent", "家长"),
     STAFF("Staff", "职员");
 
     private String key;

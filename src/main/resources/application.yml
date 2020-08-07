@@ -12,7 +12,10 @@ spring:
     # password: scs_user
     username: scs_db_user
     password: xzp@7410
-
+  servlet:
+       multipart:
+           max-request-size: 10MB
+           max-file-size: 10MB
 mybatis-plus:
   mapper-locations: classpath:/mapper/*Mapper.xml
   #实体扫描，多个package用逗号或者分号分隔
@@ -40,3 +43,12 @@ mybatis-plus:
     map-underscore-to-camel-case: true
     cache-enabled: false
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#  阿里oss存储服务
+oss:
+   endpoint: oss-cn-beijing.aliyuncs.com
+   bucketUrl: https://scs-image.oss-cn-beijing.aliyuncs.com/
+   keyid: LTAI4GGHZDsAjqUPEDTKeoQq # 填写刚刚生成的AccessKey
+   keysecret: HZnmIXgJZe87BNdIvGakAOtu0yZD5Q  # 填写刚刚生成的Accesssecret
+   bucketname: scs-image # bucket名称
+   filehost: user-image    #bucket下文件夹的路径

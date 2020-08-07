@@ -13,6 +13,12 @@ import lombok.EqualsAndHashCode;
 @TableName(value = "tb_access_ser_strategy_time")
 public class AccessStrategyTimeModel extends BaseModel {
     private String strategyId;
+
+    /**
+     *  进或者出 all
+     */
+    private String inOrOut;
+
     //日期类型:节假日,工作日,无限期
     private String dateType;
     // 开始时间
