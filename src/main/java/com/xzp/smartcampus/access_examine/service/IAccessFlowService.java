@@ -1,22 +1,24 @@
 package com.xzp.smartcampus.access_examine.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xzp.smartcampus.access_examine.model.AccessFlowModel;
 import com.xzp.smartcampus.access_examine.vo.*;
 import com.xzp.smartcampus.access_examine.vo.FullExamineFlowInfo;
 import com.xzp.smartcampus.common.service.IBaseService;
+import com.xzp.smartcampus.common.vo.PageResult;
 
 import java.util.List;
 
 public interface IAccessFlowService extends IBaseService<AccessFlowModel> {
-    void saveAccessFlow(AccessExamineVo examineVo);
 
-    void deleteAccessFlow(String id);
+    PageResult searchTodoAccessFlow(AccessFlowSearchParam searchParam, Integer current, Integer pageSize);
 
-    List<ExamineSearchResult> searchAccessExamine(ExamineSearchParam searchParam);
+    PageResult searchAlreadyAccessFlow(AccessFlowSearchParam searchParam, Integer current, Integer pageSize);
 
-    void commitAccessFlow(String id);
+    PageResult searchMineAccessFlow(AccessFlowSearchParam searchParam, Integer current, Integer pageSize);
 
-    void examineAccessFlow(ExamineFlowParam param);
+    AccessFlowModel createAccessFlow(AccessFlowModel accessFlowModel);
 
-    FullExamineFlowInfo selectExamineInfoById(String id);
+    AccessFlowModel examineAccessFlow(AccessFlowModel accessFlowModel);
 }
