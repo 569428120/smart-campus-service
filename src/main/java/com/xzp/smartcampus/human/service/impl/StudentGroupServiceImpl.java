@@ -383,6 +383,41 @@ public class StudentGroupServiceImpl extends IsolationBaseService<StudentGroupMa
     }
 
     /**
+     * 获取班级下的学生列表
+     *
+     * @param classId 班级id
+     * @param name    名称
+     * @param number  编号
+     * @return List<StudentModel>
+     */
+    @Override
+    public List<StudentModel> getStudentModelListByGroupId(String classId, String name, String number) {
+        if (StringUtils.isBlank(classId)) {
+            log.warn("classId is null");
+            return Collections.emptyList();
+        }
+        StudentGroupModel groupModel = this.selectById(classId);
+        if (groupModel == null) {
+            log.warn("groupModel is null");
+            throw new SipException("参数错误，找不到学生分组对象 classId " + classId);
+        }
+        List<String> groupIds = new ArrayList<>();
+        groupIds.add(groupModel.getId());
+        List<StudentGroupModel> childrenList = this.getChildrenList(Collections.singletonList(groupModel));
+        if (!CollectionUtils.isEmpty(childrenList)) {
+            groupIds.addAll(childrenList.stream().map(StudentGroupModel::getId).collect(Collectors.toList()));
+        }
+        List<StudentModel> studentModels = studentService.selectList(new QueryWrapper<StudentModel>()
+                .in("group_id", groupIds)
+        );
+        if (CollectionUtils.isEmpty(studentModels)) {
+            log.info("not find studentModels by groupIds {}", groupIds);
+            return Collections.emptyList();
+        }
+        return studentModels;
+    }
+
+    /**
      * 查询需要展示的但是未搜索到的数据
      *
      * @param groupModels groupModels

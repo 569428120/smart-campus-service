@@ -1,5 +1,6 @@
 package com.xzp.smartcampus.common.utils;
 
+import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 
 /**
@@ -25,6 +26,10 @@ public class UserContext {
      * @return LoginUserInfo
      */
     public static LoginUserInfo getLoginUser() {
-        return USER_LOCAL.get();
+        LoginUserInfo loginUserInfo = USER_LOCAL.get();
+        if (loginUserInfo == null) {
+            throw new SipException("数据错误，用户未登录");
+        }
+        return loginUserInfo;
     }
 }

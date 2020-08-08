@@ -2,9 +2,9 @@ package com.xzp.smartcampus.common.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
+
 
 public class DataUtil {
 
@@ -33,5 +33,23 @@ public class DataUtil {
             return Collections.emptyList();
         }
         return Arrays.asList(str.split(separator));
+    }
+
+    /**
+     * 将Object对象里面的属性和值转化成Map对象
+     *
+     * @param obj 对象
+     * @return map
+     * @throws IllegalAccessException aa
+     */
+    public static Map<String, Object> objectToMap(Object obj) throws IllegalAccessException {
+        Map<String, Object> map = new HashMap<>();
+        Class<?> clazz = obj.getClass();
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            map.put(fieldName, field.get(obj));
+        }
+        return map;
     }
 }
