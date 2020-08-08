@@ -136,7 +136,7 @@ public class AccessFlowApi {
         step1.put("stepTime", DateUtil.formatAlternativeIso8601Date(flowModel.getCreateTime()));
         records.add(step1);
         // 审核记录
-        if (StringUtils.isNotBlank(flowModel.getExamineId())) {
+        if (StringUtils.isNotBlank(flowModel.getExamineDesc())) {
             Map<String, Object> step2 = new HashMap<>(5);
             step2.put("stepName", "流程审批");
             step2.put("userName", flowModel.getExamineId());
