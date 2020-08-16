@@ -7,6 +7,8 @@ import java.util.Map;
 
 /**
  * 登录用户数据
+ *
+ * @author SGS
  */
 @Data
 public class LoginUserInfo {
@@ -22,22 +24,37 @@ public class LoginUserInfo {
     private String userType;
 
     /**
-     * 区域id
+     * 用户编号
      */
-    private String regionId;
+    private String userNumber;
 
     /**
-     * 学校id
+     * 用户名称
      */
-    private String schoolId;
+    private String name;
 
     /**
-     * 教育局map
+     * 如果用户为老师，则显示管理的班级列表，如果是学生则是学生所属的班级
      */
-    private Map<String, String> regionIdToName;
+    private List<HisClassInfo> hisClass;
 
     /**
-     * 学校id
+     * 当前教育局
      */
-    private Map<String, String> schoolIdToName;
+    private RegionInfo currRegionInfo;
+
+    /**
+     * 当前学校
+     */
+    private SchoolInfo currSchoolInfo;
+
+    /**
+     * 可切换的区域列表
+     */
+    private List<RegionInfo> regionInfoList;
+
+    /**
+     * 可切换的学校列表
+     */
+    private List<SchoolInfo> schoolInfoList;
 }

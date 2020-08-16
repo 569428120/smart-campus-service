@@ -17,17 +17,20 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/access-control")
 public class AccessRecordController {
+
     @Resource
-    IPersonalAccessRecordService personalRecordService;
+    private IPersonalAccessRecordService personalRecordService;
+
     @Resource
-    ICarAccessRecordService carRecordService;
+    private ICarAccessRecordService carRecordService;
 
     /**
      * 查询人员出入记录
-     * @param param  查询参数(人员姓名/证件/人员类型/策略类型/出入类型/验证方式)
-     * @param current
-     * @param pageSize
-     * @return
+     *
+     * @param param    查询参数(人员姓名/证件/人员类型/策略类型/出入类型/验证方式)
+     * @param current  当前页
+     * @param pageSize 页容量
+     * @return ResponseEntity<PageResult>
      */
     @GetMapping("personnel-record/gets/page")
     public ResponseEntity<PageResult> searchPersonalAccessRecord(
@@ -35,12 +38,13 @@ public class AccessRecordController {
             @RequestParam(value = "current", defaultValue = "1") Integer current,
             @RequestParam(value = "pageSize", defaultValue = "15") Integer pageSize) {
 
-        return ResponseEntity.ok(this.personalRecordService.selectPersonalAccessRecord(param,current,pageSize));
+        return ResponseEntity.ok(this.personalRecordService.selectPersonalAccessRecord(param, current, pageSize));
     }
 
     /**
      * 查询车辆出入记录
-     * @param param  查询参数(人员姓名/证件/人员类型/策略类型/出入类型)
+     *
+     * @param param    查询参数(人员姓名/证件/人员类型/策略类型/出入类型)
      * @param current
      * @param pageSize
      * @return
@@ -51,6 +55,6 @@ public class AccessRecordController {
             @RequestParam(value = "current", defaultValue = "1") Integer current,
             @RequestParam(value = "pageSize", defaultValue = "15") Integer pageSize) {
 
-        return ResponseEntity.ok(this.carRecordService.selectCarAccessRecord(param,current,pageSize));
+        return ResponseEntity.ok(this.carRecordService.selectCarAccessRecord(param, current, pageSize));
     }
 }

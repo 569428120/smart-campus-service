@@ -1,12 +1,14 @@
 package com.xzp.smartcampus.common.utils;
 
+import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 
 /**
  * 当前登录用户
  */
 public class UserContext {
-    private final static ThreadLocal<LoginUserInfo> local = new ThreadLocal<>();
+
+    private final static ThreadLocal<LoginUserInfo> USER_LOCAL = new ThreadLocal<>();
 
     /**
      * 设置当前登录用户
@@ -14,7 +16,8 @@ public class UserContext {
      * @param loginUserInfo loginUserInfo
      */
     public static void setLoginUserInfo(LoginUserInfo loginUserInfo) {
-        local.set(loginUserInfo);
+        USER_LOCAL.remove();
+        USER_LOCAL.set(loginUserInfo);
     }
 
     /**
@@ -23,8 +26,10 @@ public class UserContext {
      * @return LoginUserInfo
      */
     public static LoginUserInfo getLoginUser() {
-        return new LoginUserInfo();
-        // TODO  方便测试先注释
-        //return local.get();
+        LoginUserInfo loginUserInfo = USER_LOCAL.get();
+        if (loginUserInfo == null) {
+            throw new SipException("数据错误，用户未登录");
+        }
+        return loginUserInfo;
     }
 }

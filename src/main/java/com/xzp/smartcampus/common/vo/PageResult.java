@@ -3,6 +3,7 @@ package com.xzp.smartcampus.common.vo;
 
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,5 +28,7 @@ public class PageResult<T> {
         this.data = data;
     }
 
-
+    public static <T> PageResult<T> emptyPageResult() {
+        return new PageResult<T>(0L, 0, Collections.emptyList());
+    }
 }

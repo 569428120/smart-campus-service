@@ -1,12 +1,10 @@
 package com.xzp.smartcampus.system.web;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.system.model.RegionModel;
 import com.xzp.smartcampus.system.service.IRegionService;
 import com.xzp.smartcampus.system.vo.RegionVo;
-import com.xzp.smartcampus.test.model.TestModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

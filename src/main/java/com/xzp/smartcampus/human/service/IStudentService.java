@@ -5,6 +5,7 @@ import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.StudentModel;
 import com.xzp.smartcampus.human.vo.StudentVo;
+import com.xzp.smartcampus.human.vo.UserVo;
 
 import java.util.List;
 
@@ -45,4 +46,34 @@ public interface IStudentService extends IBaseService<StudentModel> {
      * @return List<StudentVo>
      */
     List<StudentVo> getStudentVoListByIds(List<String> studentIds);
+
+    /**
+     * 分页查询，转换为UserVo对象
+     *
+     * @param searchValue searchValue
+     * @param groupId     groupId
+     * @param current     current
+     * @param pageSize    pageSize
+     * @return PageResult<UserVo>
+     */
+    PageResult<UserVo> getUserVoPage(UserVo searchValue, String groupId, Integer current, Integer pageSize);
+
+    /**
+     * 获得家长列表
+     *
+     * @param searchValue searchValue
+     * @param groupId     groupId
+     * @param current     current
+     * @param pageSize    pageSize
+     * @return PageResult<UserVo>
+     */
+    PageResult<UserVo> getParentUserVoPage(UserVo searchValue, String groupId, Integer current, Integer pageSize);
+
+    /**
+     * 根据用户id获得家长列表
+     *
+     * @param userIds userIds
+     * @return List<UserVo>
+     */
+    List<UserVo> getParentUserVoListByIds(List<String> userIds);
 }

@@ -24,17 +24,18 @@ public class LoginHandlerInterceptor extends HandlerInterceptorAdapter {
     /**
      * 登录拦截
      *
-     * @param request
-     * @param response
-     * @param handler
-     * @return
-     * @throws Exception
+     * @param request  请求对象
+     * @param response 响应对象
+     * @param handler  处理函数
+     * @return boolean
+     * @throws Exception Exception
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
-        return true;
-        /*   TODO 方便测试先注释, 硬件回调的接口都不做校验
+        if (request.getRequestURI().contains("auth/") || request.getRequestURI().contains("auth_routes")) {
+            log.info("to {}  " + request.getRequestURI());
+            return true;
+        }
         String token = request.getHeader("authentication");
         // 没有登录
         if (StringUtils.isBlank(token)) {
@@ -50,8 +51,6 @@ public class LoginHandlerInterceptor extends HandlerInterceptorAdapter {
         }
         UserContext.setLoginUserInfo(loginUserInfo);
         return true;
-
-         */
     }
 
 

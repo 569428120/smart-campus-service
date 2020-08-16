@@ -4,13 +4,17 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.xzp.smartcampus.common.model.BaseModel;
+import com.xzp.smartcampus.human.vo.FeatureCardVo;
+import com.xzp.smartcampus.human.vo.IFeatureVo;
+import com.xzp.smartcampus.human.vo.IModelToFeatureVo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.beans.BeanUtils;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "tb_human_ser_feature_card")
-public class CardModel extends BaseModel {
+public class CardModel extends BaseModel implements IModelToFeatureVo {
 
     /**
      * 用户id
@@ -20,7 +24,7 @@ public class CardModel extends BaseModel {
     /**
      * 卡类型
      */
-        private String cardType;
+    private String cardType;
 
     /**
      * 卡号
@@ -32,4 +36,11 @@ public class CardModel extends BaseModel {
      */
     @TableField(strategy = FieldStrategy.IGNORED)
     private String description;
+
+    @Override
+    public IFeatureVo toFeatureVo() {
+        FeatureCardVo cardVo = new FeatureCardVo();
+        BeanUtils.copyProperties(this, cardVo);
+        return cardVo;
+    }
 }

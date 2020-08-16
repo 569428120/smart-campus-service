@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FeatureCardVo extends CardModel {
+public class FeatureCardVo extends CardModel implements IFeatureVo {
 
     /**
      * 分组
@@ -27,4 +27,9 @@ public class FeatureCardVo extends CardModel {
      * 用户类型
      */
     private String userType;
+
+    /**
+     * 用户对象
+     */
+    private UserVo userVo;
 }

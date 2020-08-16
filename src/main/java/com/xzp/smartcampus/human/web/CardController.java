@@ -1,11 +1,13 @@
 package com.xzp.smartcampus.human.web;
 
 
+import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.CardModel;
 import com.xzp.smartcampus.human.model.StaffGroupModel;
 import com.xzp.smartcampus.human.service.IFeatureCardService;
 import com.xzp.smartcampus.human.vo.FeatureCardVo;
+import com.xzp.smartcampus.human.vo.IFeatureVo;
 import com.xzp.smartcampus.human.vo.UserGroupTreeVo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,10 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 
+
+/**
+ * @author xuzhipeng
+ */
 @RestController
 @RequestMapping("/human/card")
 public class CardController {
@@ -28,9 +34,9 @@ public class CardController {
      * @return ResponseEntity<PageResult>
      */
     @GetMapping("/gets/page")
-    public ResponseEntity<PageResult<FeatureCardVo>> getFeatureCardVoList(FeatureCardVo searchValue,
-                                                                          @RequestParam(value = "current") Integer current,
-                                                                          @RequestParam(value = "pageSize") Integer pageSize) {
+    public ResponseEntity<PageResult<IFeatureVo>> getFeatureCardVoList(FeatureCardVo searchValue,
+                                                                       @RequestParam(value = "current") Integer current,
+                                                                       @RequestParam(value = "pageSize") Integer pageSize) {
         return ResponseEntity.ok(cardService.getFeatureCardVoList(searchValue, current, pageSize));
     }
 
@@ -46,9 +52,25 @@ public class CardController {
     }
 
     /**
+     * 校验
+     *
+     * @param cardModel cardModel
+     * @return CardModel
+     */
+    @PostMapping("/validator")
+    public ResponseEntity<String> validatorCardModel(@RequestBody CardModel cardModel) {
+        try {
+            cardService.validatorCardModel(cardModel);
+        } catch (SipException e) {
+            return ResponseEntity.ok(e.getMessage());
+        }
+        return ResponseEntity.ok("");
+    }
+
+    /**
      * 删除数据
      *
-     * @param groupIds menuIds
+     * @param cardIds cardIds
      * @return ResponseEntity<String>
      */
     @GetMapping("/deletes/deletes-by-ids")
