@@ -3,7 +3,7 @@ package com.xzp.smartcampus.device.gate.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xzp.smartcampus.common.exception.SipException;
-import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.service.NonIsolationBaseService;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.device.gate.mapper.GateMapper;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(rollbackFor = Exception.class)
 @Slf4j
-public class GateServiceImpl extends IsolationBaseService<GateMapper, GateModel> implements IGateService {
+public class GateServiceImpl extends NonIsolationBaseService<GateMapper, GateModel> implements IGateService {
 
     @Resource
     private IManufacturerService manufacturerService;
@@ -48,6 +48,7 @@ public class GateServiceImpl extends IsolationBaseService<GateMapper, GateModel>
     @Override
     public PageResult<GateVo> getGateListPage(GateModel searchValue, Integer current, Integer pageSize) {
         PageResult<GateModel> gatePage = this.selectPage(new Page<>(current, pageSize), new QueryWrapper<GateModel>()
+                .eq(StringUtils.isNotBlank(searchValue.getSchoolId()), "school_id", searchValue.getSchoolId())
                 .eq(StringUtils.isNotBlank(searchValue.getManufacturerId()), "manufacturer_id", searchValue.getManufacturerId())
                 .eq(StringUtils.isNotBlank(searchValue.getManufacturerTypeId()), "manufacturer_type_id", searchValue.getManufacturerTypeId())
                 .eq(StringUtils.isNotBlank(searchValue.getStatus()), "status", searchValue.getStatus())

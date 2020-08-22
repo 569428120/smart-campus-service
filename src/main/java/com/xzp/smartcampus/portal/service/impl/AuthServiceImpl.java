@@ -4,10 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.utils.JsonUtils;
 import com.xzp.smartcampus.common.utils.JwtUtil;
+import com.xzp.smartcampus.human.mapper.ClassToUserMapper;
 import com.xzp.smartcampus.human.mapper.StaffMapper;
+import com.xzp.smartcampus.human.mapper.StudentGroupMapper;
+import com.xzp.smartcampus.human.model.ClassToUserModel;
 import com.xzp.smartcampus.human.model.StaffModel;
+import com.xzp.smartcampus.human.model.StudentGroupModel;
 import com.xzp.smartcampus.human.service.IStaffUserService;
 import com.xzp.smartcampus.portal.service.IAuthService;
+import com.xzp.smartcampus.portal.vo.HisClassInfo;
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 import com.xzp.smartcampus.portal.vo.RegionInfo;
 import com.xzp.smartcampus.portal.vo.SchoolInfo;
@@ -41,6 +46,12 @@ public class AuthServiceImpl implements IAuthService {
 
     @Resource
     private SchoolMapper schoolMapper;
+
+    @Resource
+    private StudentGroupMapper studentGroupMapper;
+
+    @Resource
+    private ClassToUserMapper classToUserMapper;
 
     /**
      * 用户登录
@@ -80,6 +91,7 @@ public class AuthServiceImpl implements IAuthService {
             userInfo.setUserType(currUser.getUserType());
             userInfo.setUserNumber(currUser.getUserJobCode());
             userInfo.setName(currUser.getName());
+            userInfo.setHisClass(this.getHisClassById(currUser.getId()));
             userInfo.setCurrRegionInfo(this.getRegionInfoById(currUser.getRegionId()));
             userInfo.setCurrSchoolInfo(this.getSchoolInfoById(currUser.getSchoolId()));
             userInfo.setRegionInfoList(this.getRegionInfoListByIds(regionIds));
@@ -94,6 +106,40 @@ public class AuthServiceImpl implements IAuthService {
             login.put("errorMsg", e.getMessage());
         }
         return login;
+    }
+
+    /**
+     * 返回所在管理的班级 TODO 需要根据用户类型区分处理
+     *
+     * @param userId 用户id
+     * @return List<HisClassInfo>
+     */
+    private List<HisClassInfo> getHisClassById(String userId) {
+        if (StringUtils.isBlank(userId)) {
+            return Collections.emptyList();
+        }
+        List<ClassToUserModel> classToUserModels = classToUserMapper.selectList(new QueryWrapper<ClassToUserModel>()
+                .eq("user_id", userId)
+        );
+        if (CollectionUtils.isEmpty(classToUserModels)) {
+            log.info("not find classToUserModels by userId {}", userId);
+            return Collections.emptyList();
+        }
+        List<String> classIds = classToUserModels.stream().map(ClassToUserModel::getClassId).collect(Collectors.toList());
+        List<StudentGroupModel> groupModels = studentGroupMapper.selectList(new QueryWrapper<StudentGroupModel>()
+                .in("id", classIds)
+                .orderByDesc("grade_level", "group_name")
+        );
+        if (CollectionUtils.isEmpty(groupModels)) {
+            log.info("groupModels not find by classIds {}", classIds);
+            return Collections.emptyList();
+        }
+        return groupModels.stream().map(item -> {
+            HisClassInfo classInfo = new HisClassInfo();
+            classInfo.setClassId(item.getId());
+            classInfo.setClassName(item.getGradeLevel() + "年级 " + item.getGroupName());
+            return classInfo;
+        }).collect(Collectors.toList());
     }
 
     /**

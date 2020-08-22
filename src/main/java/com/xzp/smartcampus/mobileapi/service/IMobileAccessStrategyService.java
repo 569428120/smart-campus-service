@@ -41,4 +41,13 @@ public interface IMobileAccessStrategyService {
      * @param strategyIds 策略id
      */
     void deleteStrategyByIds(List<String> strategyIds);
+
+
+    /**
+     * 根据id查询
+     *
+     * @param strategyId strategyId
+     * @return AccessStrategyVo
+     */
+    AccessStrategyVo getAccessStrategyVoById(String strategyId);
 }
