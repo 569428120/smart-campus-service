@@ -5,6 +5,7 @@ import com.xzp.smartcampus.human.service.IExamineUserService;
 import com.xzp.smartcampus.human.vo.ExamineUserVo;
 import com.xzp.smartcampus.mobileapi.param.MyCardParam;
 import com.xzp.smartcampus.mobileapi.param.CrQueryParam;
+import com.xzp.smartcampus.mobileapi.param.QuotaParam;
 import com.xzp.smartcampus.mobileapi.service.IOneCardPassService;
 import com.xzp.smartcampus.mobileapi.vo.AmountVo;
 import com.xzp.smartcampus.mobileapi.vo.CardVo;
@@ -49,7 +50,7 @@ public class OneCardPassApi {
      * @return PageResult<AmountVo>
      */
     @GetMapping("/consumption-record/gets/page")
-    public ResponseEntity<PageResult<AmountVo>> getConsumptionRecord(CrQueryParam queryParam, Integer current, Integer pageSize) {
+    public ResponseEntity<PageResult<AmountVo>> getConsumptionRecord(@Valid CrQueryParam queryParam, Integer current, Integer pageSize) {
         return ResponseEntity.ok(oneCardPassService.getConsumptionRecord(queryParam, current, pageSize));
     }
 
@@ -90,5 +91,21 @@ public class OneCardPassApi {
     public ResponseEntity<List<ExamineUserVo>> getExamineUserList(String classId, String name, String number) {
         return ResponseEntity.ok(examineUserService.getCardExamineUserList(classId, name, number));
     }
-    
+
+    /**
+     * 一卡通限额接口
+     *
+     * @param quotaParam 参数
+     * @return String
+     */
+    @PostMapping("/my-card/quota/posts")
+    public ResponseEntity<String> saveQuota(@RequestBody @Valid QuotaParam quotaParam) {
+        oneCardPassService.saveCardQuota(quotaParam);
+        return ResponseEntity.ok("操作成功");
+    }
+
+    @PostMapping("my-card/recharge/posts")
+    public ResponseEntity<String> saveCardRecharge(@RequestBody @Valid QuotaParam quotaParam) {
+        return ResponseEntity.ok("暂不支持充值");
+    }
 }

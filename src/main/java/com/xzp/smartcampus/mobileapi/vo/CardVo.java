@@ -1,6 +1,8 @@
 package com.xzp.smartcampus.mobileapi.vo;
 
+import com.xzp.smartcampus.human.model.CardModel;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 import java.math.BigDecimal;
 
@@ -51,4 +53,14 @@ public class CardVo {
      * 余额
      */
     private BigDecimal balance;
+
+    /**
+     * 申请原因
+     */
+    private String reason;
+
+    /**
+     * 描述
+     */
+    private String description;
 }

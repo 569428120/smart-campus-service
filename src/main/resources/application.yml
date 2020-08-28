@@ -48,7 +48,9 @@ mybatis-plus:
 oss:
    endpoint: oss-cn-beijing.aliyuncs.com
    bucketUrl: https://scs-image.oss-cn-beijing.aliyuncs.com/
-   keyid: LTAI4GGHZDsAjqUPEDTKeoQq # 填写刚刚生成的AccessKey
-   keysecret: HZnmIXgJZe87BNdIvGakAOtu0yZD5Q  # 填写刚刚生成的Accesssecret
+   keyid: aaaaaa # 填写刚刚生成的AccessKey
+   keysecret: aaa  # 填写刚刚生成的Accesssecret
    bucketname: scs-image # bucket名称
    filehost: user-image    #bucket下文件夹的路径
+ykt:
+   url: http://120.25.59.199:5088

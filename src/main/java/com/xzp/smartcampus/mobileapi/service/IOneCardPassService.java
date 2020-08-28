@@ -3,6 +3,7 @@ package com.xzp.smartcampus.mobileapi.service;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.mobileapi.param.MyCardParam;
 import com.xzp.smartcampus.mobileapi.param.CrQueryParam;
+import com.xzp.smartcampus.mobileapi.param.QuotaParam;
 import com.xzp.smartcampus.mobileapi.vo.AmountVo;
 import com.xzp.smartcampus.mobileapi.vo.CardVo;
 
@@ -44,7 +45,14 @@ public interface IOneCardPassService {
     /**
      * 创建我的卡申请
      *
-     * @param cardParam
+     * @param cardParam 参数
      */
     void saveMyCard(MyCardParam cardParam);
+
+    /**
+     * 限额
+     *
+     * @param quotaParam 参数
+     */
+    void saveCardQuota(@Valid QuotaParam quotaParam);
 }

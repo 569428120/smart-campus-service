@@ -20,6 +20,11 @@ public class ExamineUserModel extends BaseModel {
     public static final String EXAMINE_TYPE_ACCESS = "AccessExamine";
 
     /**
+     * 一卡通审核
+     */
+    public static final String EXAMINE_TYPE_CARD = "CardExamine";
+
+    /**
      * 审核类型
      */
     private String examineType;
