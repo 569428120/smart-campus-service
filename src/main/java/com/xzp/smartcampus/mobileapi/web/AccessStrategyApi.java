@@ -40,6 +40,11 @@ public class AccessStrategyApi {
         return ResponseEntity.ok(strategyService.getAccessStrategyPage(searchParam, current, pageSize));
     }
 
+    @GetMapping("/gets/gets-by-id")
+    public ResponseEntity<AccessStrategyVo> getAccessStrategyVoById(String strategyId) {
+        return ResponseEntity.ok(strategyService.getAccessStrategyVoById(strategyId));
+    }
+
     /**
      * 保存策略
      *
@@ -60,7 +65,7 @@ public class AccessStrategyApi {
      * @return String
      */
     @PostMapping("/strategy-to-group/posts")
-    public ResponseEntity<String> strategyToGroups(String strategyId, List<String> groupIds) {
+    public ResponseEntity<String> strategyToGroups(@RequestParam(value = "strategyId") String strategyId, @RequestParam(value = "groupIds") List<String> groupIds) {
         strategyService.saveStrategyToGroupIds(strategyId, groupIds);
         return ResponseEntity.ok("ok");
     }
@@ -72,7 +77,7 @@ public class AccessStrategyApi {
      * @return String
      */
     @DeleteMapping("/deletes/deletes-by-ids")
-    public ResponseEntity<String> deleteStrategyByIds(List<String> strategyIds) {
+    public ResponseEntity<String> deleteStrategyByIds(@RequestParam(value = "strategyIds") List<String> strategyIds) {
         strategyService.deleteStrategyByIds(strategyIds);
         return ResponseEntity.ok("ok");
     }

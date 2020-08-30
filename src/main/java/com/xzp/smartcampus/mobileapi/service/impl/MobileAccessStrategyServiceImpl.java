@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyModel;
 import com.xzp.smartcampus.access_strategy.model.AccessStrategyTimeModel;
+import com.xzp.smartcampus.access_strategy.model.AccessStrategyToGroupModel;
 import com.xzp.smartcampus.access_strategy.service.IAccessStrategyControlService;
 import com.xzp.smartcampus.access_strategy.service.IAccessStrategyService;
 import com.xzp.smartcampus.access_strategy.service.IAccessStrategyTimeService;
+import com.xzp.smartcampus.access_strategy.service.IAccessStrategyToGroupService;
 import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.vo.PageResult;
@@ -21,6 +23,7 @@ import com.xzp.smartcampus.mobileapi.vo.UserGroupVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -42,6 +45,9 @@ public class MobileAccessStrategyServiceImpl implements IMobileAccessStrategySer
 
     @Resource
     private IAccessStrategyTimeService strategyTimeService;
+
+    @Resource
+    private IAccessStrategyToGroupService strategyToGroupService;
 
     @Resource
     private IStudentGroupService studentGroupService;
@@ -129,29 +135,41 @@ public class MobileAccessStrategyServiceImpl implements IMobileAccessStrategySer
             log.warn("strategyIds is null");
             return Collections.emptyMap();
         }
-        Map<String, List<UserGroupVo>> strategyIdToUserGroupVoListMap = new HashMap<>(16);
-        // 学生组
-        List<StudentGroupModel> studentGroupModels = studentGroupService.selectList(new QueryWrapper<StudentGroupModel>()
-                .in("access_strategy_id", strategyIds)
+        List<AccessStrategyToGroupModel> strategyToGroupModels = strategyToGroupService.selectList(new QueryWrapper<AccessStrategyToGroupModel>()
+                .in("strategy_id", strategyIds)
         );
+        if (CollectionUtils.isEmpty(strategyToGroupModels)) {
+            return Collections.emptyMap();
+        }
+        Map<String, List<String>> strategyIdGroupIdsMap = new HashMap<>(strategyIds.size());
+        List<String> groupIds = new ArrayList<>();
+        strategyToGroupModels.forEach(item -> {
+            strategyIdGroupIdsMap.computeIfAbsent(item.getStrategyId(), k -> new ArrayList<>()).add(item.getGroupId());
+            groupIds.add(item.getGroupId());
+        });
+        List<UserGroupVo> userGroupVos = new ArrayList<>();
+        // 学生组
+        List<StudentGroupModel> studentGroupModels = studentGroupService.selectByIds(groupIds);
         if (!CollectionUtils.isEmpty(studentGroupModels)) {
-            studentGroupModels.forEach(item -> {
-                UserGroupVo groupVo = new UserGroupVo();
-                BeanUtils.copyProperties(item, groupVo);
-                strategyIdToUserGroupVoListMap.computeIfAbsent(item.getAccessStrategyId(), k -> new ArrayList<>()).add(groupVo);
-            });
+            userGroupVos.addAll(studentGroupModels.stream().map(UserGroupVo::newInstance).collect(Collectors.toList()));
         }
         // 职工组
-        List<StaffGroupModel> userGroupModels = userGroupService.selectList(new QueryWrapper<StaffGroupModel>()
-                .in("access_strategy_id", strategyIds)
-        );
+        List<StaffGroupModel> userGroupModels = userGroupService.selectByIds(groupIds);
         if (!CollectionUtils.isEmpty(userGroupModels)) {
-            userGroupModels.forEach(item -> {
-                UserGroupVo groupVo = new UserGroupVo();
-                BeanUtils.copyProperties(item, groupVo);
-                strategyIdToUserGroupVoListMap.computeIfAbsent(item.getAccessStrategyId(), k -> new ArrayList<>()).add(groupVo);
-            });
+            userGroupVos.addAll(userGroupModels.stream().map(UserGroupVo::newInstance).collect(Collectors.toList()));
         }
+        Map<String, UserGroupVo> groupIdToVoMap = userGroupVos.stream().collect(Collectors.toMap(UserGroupVo::getId, k -> k));
+        // 设置映射关系
+        Map<String, List<UserGroupVo>> strategyIdToUserGroupVoListMap = new HashMap<>(strategyIds.size());
+        strategyIdGroupIdsMap.forEach((strategyId, toGroupIds) -> {
+            List<UserGroupVo> groupVos = new ArrayList<>();
+            toGroupIds.forEach(gId -> {
+                if (groupIdToVoMap.containsKey(gId)) {
+                    groupVos.add(groupIdToVoMap.get(gId));
+                }
+            });
+            strategyIdToUserGroupVoListMap.put(strategyId, groupVos);
+        });
 
         return strategyIdToUserGroupVoListMap;
     }
@@ -243,18 +261,19 @@ public class MobileAccessStrategyServiceImpl implements IMobileAccessStrategySer
             log.warn("strategyId or groupIds is null");
             return;
         }
-        // 学生组
-        List<StudentGroupModel> studentGroupModels = studentGroupService.selectByIds(groupIds);
-        if (!CollectionUtils.isEmpty(studentGroupModels)) {
-            studentGroupModels.forEach(item -> item.setAccessStrategyId(strategyId));
-            studentGroupService.updateBatch(studentGroupModels);
-        }
-        // 职工组
-        List<StaffGroupModel> userGroupModels = userGroupService.selectByIds(groupIds);
-        if (!CollectionUtils.isEmpty(userGroupModels)) {
-            userGroupModels.forEach(item -> item.setAccessStrategyId(strategyId));
-            userGroupService.updateBatch(userGroupModels);
-        }
+        // 清除之前的关联数据
+        strategyToGroupService.delete(new UpdateWrapper<AccessStrategyToGroupModel>()
+                .eq("strategy_id", strategyId)
+        );
+        // 重新建立关联
+        List<AccessStrategyToGroupModel> strategyToGroupModels = groupIds.stream().map(groupId -> {
+            AccessStrategyToGroupModel strategyToGroupModel = new AccessStrategyToGroupModel();
+            strategyToGroupModel.setGroupId(groupId);
+            strategyToGroupModel.setStrategyId(strategyId);
+            return strategyToGroupModel;
+        }).collect(Collectors.toList());
+        // 保存数据
+        strategyToGroupService.insertBatch(strategyToGroupModels);
     }
 
     /**
@@ -274,5 +293,29 @@ public class MobileAccessStrategyServiceImpl implements IMobileAccessStrategySer
         );
         // 删除自身
         strategyService.deleteByIds(strategyIds);
+    }
+
+    /**
+     * 根据id查询
+     *
+     * @param strategyId strategyId
+     * @return AccessStrategyVo
+     */
+    @Override
+    public AccessStrategyVo getAccessStrategyVoById(String strategyId) {
+        if (StringUtils.isBlank(strategyId)) {
+            log.warn("strategyId is null");
+            throw new SipException("参数错误，strategyId不能为空");
+        }
+        AccessStrategyModel strategyModel = strategyService.selectById(strategyId);
+        if (strategyModel == null) {
+            log.warn("strategyModel not find by strategyId {}", strategyId);
+            throw new SipException("参数错误，找不到数据 strategyId " + strategyId);
+        }
+        List<AccessStrategyVo> strategyVos = this.toAccessStrategyVos(Collections.singletonList(strategyModel));
+        if (CollectionUtils.isEmpty(strategyVos)) {
+            return null;
+        }
+        return strategyVos.get(0);
     }
 }

@@ -20,4 +20,14 @@ public interface IExamineUserService extends IBaseService<ExamineUserModel> {
      * @return List<ExamineUserVo>
      */
     List<ExamineUserVo> getAccessExamineUserList(String classId, String name, String number);
+
+    /**
+     * 获取卡的审核人列表
+     *
+     * @param classId 班级id
+     * @param name    名称
+     * @param number  编号
+     * @return List<ExamineUserVo>
+     */
+    List<ExamineUserVo> getCardExamineUserList(String classId, String name, String number);
 }

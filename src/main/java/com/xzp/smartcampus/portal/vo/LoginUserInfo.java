@@ -29,6 +29,11 @@ public class LoginUserInfo {
     private String userNumber;
 
     /**
+     * 手机号码
+     */
+    private String contact;
+
+    /**
      * 用户名称
      */
     private String name;
