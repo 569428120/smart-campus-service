@@ -24,6 +24,14 @@ public interface IFeatureFaceService extends IBaseService<FaceModel> {
     PageResult<IFeatureVo> getFeatureFaceVoList(FeatureFaceVo searchValue, Integer current, Integer pageSize);
 
     /**
+     * 将model转换为vo
+     *
+     * @param data data
+     * @return List<IFeatureVo>
+     */
+    List<IFeatureVo> toFaceVoList(List<FaceModel> data);
+
+    /**
      * 保存
      *
      * @param faceModel faceModel

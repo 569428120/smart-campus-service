@@ -69,7 +69,8 @@ public class FeatureFaceServiceImpl extends IsolationBaseService<FaceMapper, Fac
      * @param data data
      * @return List<IFeatureVo>
      */
-    private List<IFeatureVo> toFaceVoList(List<FaceModel> data) {
+    @Override
+    public List<IFeatureVo> toFaceVoList(List<FaceModel> data) {
         if (CollectionUtils.isEmpty(data)) {
             return Collections.emptyList();
         }

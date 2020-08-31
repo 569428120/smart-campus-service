@@ -17,6 +17,11 @@ public class FeatureFaceVo extends FaceModel implements IFeatureVo {
     private String groupName;
 
     /**
+     * 分组id
+     */
+    private String groupId;
+
+    /**
      * 身份证或者学号
      */
     private String userCode;

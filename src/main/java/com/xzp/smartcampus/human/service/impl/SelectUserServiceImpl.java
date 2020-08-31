@@ -100,7 +100,10 @@ public class SelectUserServiceImpl implements ISelectUserService {
      */
     @Override
     public List<String> getUserIds(IFeatureVo searchValue) {
-        if (StringUtils.isBlank(searchValue.getUserType()) && StringUtils.isBlank(searchValue.getName()) && StringUtils.isBlank(searchValue.getUserCode())) {
+        if (StringUtils.isBlank(searchValue.getUserType())
+                && StringUtils.isBlank(searchValue.getName())
+                && StringUtils.isBlank(searchValue.getUserCode())
+                && StringUtils.isBlank(searchValue.getGroupId())) {
             return Collections.emptyList();
         }
         List<String> userIds = new ArrayList<>();
@@ -211,13 +214,17 @@ public class SelectUserServiceImpl implements ISelectUserService {
      * @return List<StudentModel>
      */
     private List<StudentModel> getStudentModels(IFeatureVo searchValue) {
-        if (StringUtils.isBlank(searchValue.getUserType()) && StringUtils.isBlank(searchValue.getName()) && StringUtils.isBlank(searchValue.getUserCode())) {
+        if (StringUtils.isBlank(searchValue.getUserType())
+                && StringUtils.isBlank(searchValue.getName())
+                && StringUtils.isBlank(searchValue.getUserCode())
+                && StringUtils.isBlank(searchValue.getGroupId())) {
             return Collections.emptyList();
         }
         if (StringUtils.isNotBlank(searchValue.getUserType()) && !UserType.STUDENT.getKey().equals(searchValue.getUserType())) {
             return Collections.emptyList();
         }
         return studentService.selectList(new QueryWrapper<StudentModel>()
+                .eq(StringUtils.isNotBlank(searchValue.getGroupId()), "group_id", searchValue.getGroupId())
                 .like(StringUtils.isNotBlank(searchValue.getName()), "name", searchValue.getName())
                 .like(StringUtils.isNotBlank(searchValue.getUserCode()), "student_code", searchValue.getUserCode())
         );
@@ -231,7 +238,10 @@ public class SelectUserServiceImpl implements ISelectUserService {
      */
     private List<StaffModel> getStaffModels(IFeatureVo searchValue) {
         // 没有过滤条件则不进入
-        if (StringUtils.isBlank(searchValue.getUserType()) && StringUtils.isBlank(searchValue.getName()) && StringUtils.isBlank(searchValue.getUserCode())) {
+        if (StringUtils.isBlank(searchValue.getUserType())
+                && StringUtils.isBlank(searchValue.getName())
+                && StringUtils.isBlank(searchValue.getUserCode())
+                && StringUtils.isBlank(searchValue.getGroupId())) {
             return Collections.emptyList();
         }
         if (StringUtils.isNotBlank(searchValue.getUserType()) && !UserType.STAFF.getKey().equals(searchValue.getUserType()) && !UserType.TEACHER.getKey().equals(searchValue.getUserType())) {
@@ -239,6 +249,7 @@ public class SelectUserServiceImpl implements ISelectUserService {
         }
         return userService.selectList(new QueryWrapper<StaffModel>()
                 .eq(StringUtils.isNotBlank(searchValue.getUserType()), "user_type", searchValue.getUserType())
+                .eq(StringUtils.isNotBlank(searchValue.getGroupId()), "group_id", searchValue.getGroupId())
                 .like(StringUtils.isNotBlank(searchValue.getName()), "name", searchValue.getName())
                 .like(StringUtils.isNotBlank(searchValue.getUserCode()), "user_identity", searchValue.getUserCode())
         );

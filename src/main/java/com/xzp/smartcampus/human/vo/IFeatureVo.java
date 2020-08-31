@@ -6,6 +6,10 @@ public interface IFeatureVo {
 
     void setGroupName(String groupName);
 
+    String getGroupId();
+
+    void setGroupId(String groupId);
+
     String getUserCode();
 
     void setUserCode(String userCode);
