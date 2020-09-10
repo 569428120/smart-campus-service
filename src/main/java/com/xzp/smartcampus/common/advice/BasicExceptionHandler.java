@@ -8,6 +8,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -39,6 +40,12 @@ public class BasicExceptionHandler {
     public ResponseEntity<ExceptionResult> handleValidException(BindException e) {
         return ResponseEntity.status(500).body(new ExceptionResult(500, this.getValidMessage(e.getBindingResult())));
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResult> handleValidException1(MethodArgumentNotValidException e) {
+        return ResponseEntity.status(500).body(new ExceptionResult(500, this.getValidMessage(e.getBindingResult())));
+    }
+
 
     /**
      * 获取校验错误提示

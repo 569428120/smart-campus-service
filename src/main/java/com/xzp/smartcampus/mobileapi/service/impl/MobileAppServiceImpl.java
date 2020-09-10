@@ -63,6 +63,7 @@ public class MobileAppServiceImpl implements IMobileAppService {
             appInfo.setUrl(item.getRoute());
             appInfo.setGroupId(item.getPid());
             appInfo.setGroupName(groupModel == null ? "缺失" : groupModel.getMenuName());
+            appInfo.setIconUrl(item.getIconUrl());
             appInfo.setDescription(item.getDescription());
             return appInfo;
         }).collect(Collectors.toList());

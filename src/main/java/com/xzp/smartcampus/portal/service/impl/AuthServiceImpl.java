@@ -78,34 +78,45 @@ public class AuthServiceImpl implements IAuthService {
                 log.warn("not find user");
                 throw new SipException("登录失败，账号或者密码错误");
             }
-            Set<String> regionIds = staffModels.stream()
-                    .filter(item -> StringUtils.isNotBlank(item.getRegionId()))
-                    .map(StaffModel::getRegionId).collect(Collectors.toSet());
-            Set<String> schoolIds = staffModels.stream()
-                    .filter(item -> StringUtils.isNotBlank(item.getSchoolId()))
-                    .map(StaffModel::getSchoolId).collect(Collectors.toSet());
-            // 默认使用第一个找到的用户
-            StaffModel currUser = staffModels.get(0);
-            LoginUserInfo userInfo = new LoginUserInfo();
-            userInfo.setUserId(currUser.getId());
-            userInfo.setUserType(currUser.getUserType());
-            userInfo.setUserNumber(currUser.getUserJobCode());
-            userInfo.setName(currUser.getName());
-            userInfo.setHisClass(this.getHisClassById(currUser.getId()));
-            userInfo.setCurrRegionInfo(this.getRegionInfoById(currUser.getRegionId()));
-            userInfo.setCurrSchoolInfo(this.getSchoolInfoById(currUser.getSchoolId()));
-            userInfo.setRegionInfoList(this.getRegionInfoListByIds(regionIds));
-            userInfo.setSchoolInfoList(this.getSchoolInfoListByIds(schoolIds));
-            // 设置返回数据
-            login.put("status", "ok");
-            login.put("errorMsg", "");
-            login.put("authentication", JwtUtil.sign(JsonUtils.toString(userInfo)));
-            login.put("userInfo", userInfo);
+            // 设置登录数据
+            this.createLoginUserData(login, staffModels);
         } catch (Exception e) {
             login.put("status", "error");
             login.put("errorMsg", e.getMessage());
         }
         return login;
+    }
+
+    /**
+     * 设置登录数据
+     *
+     * @param login       map
+     * @param staffModels 用户数据
+     */
+    private void createLoginUserData(Map<String, Object> login, List<StaffModel> staffModels) {
+        Set<String> regionIds = staffModels.stream()
+                .filter(item -> StringUtils.isNotBlank(item.getRegionId()))
+                .map(StaffModel::getRegionId).collect(Collectors.toSet());
+        Set<String> schoolIds = staffModels.stream()
+                .filter(item -> StringUtils.isNotBlank(item.getSchoolId()))
+                .map(StaffModel::getSchoolId).collect(Collectors.toSet());
+        // 默认使用第一个找到的用户
+        StaffModel currUser = staffModels.get(0);
+        LoginUserInfo userInfo = new LoginUserInfo();
+        userInfo.setUserId(currUser.getId());
+        userInfo.setUserType(currUser.getUserType());
+        userInfo.setUserNumber(currUser.getUserJobCode());
+        userInfo.setName(currUser.getName());
+        userInfo.setHisClass(this.getHisClassById(currUser.getId()));
+        userInfo.setCurrRegionInfo(this.getRegionInfoById(currUser.getRegionId()));
+        userInfo.setCurrSchoolInfo(this.getSchoolInfoById(currUser.getSchoolId()));
+        userInfo.setRegionInfoList(this.getRegionInfoListByIds(regionIds));
+        userInfo.setSchoolInfoList(this.getSchoolInfoListByIds(schoolIds));
+        // 设置返回数据
+        login.put("status", "ok");
+        login.put("errorMsg", "");
+        login.put("authentication", JwtUtil.sign(JsonUtils.toString(userInfo)));
+        login.put("userInfo", userInfo);
     }
 
     /**
@@ -241,5 +252,37 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public LoginUserInfo getLoginUserByToken(String token) {
         return null;
+    }
+
+    /**
+     * 手机号码登录
+     *
+     * @param mobileNumber     手机号码
+     * @param verificationCode 验证码
+     * @return 返回
+     */
+    @Override
+    public Map<String, Object> mobileLogin(String mobileNumber, String verificationCode) {
+        Map<String, Object> login = new HashMap<>(10);
+        try {
+            if (StringUtils.isBlank(mobileNumber) || StringUtils.isBlank(verificationCode)) {
+                log.warn("mobileNumber or verificationCode is null");
+                throw new SipException("参数错误，手机号码和验证码不能为空");
+            }
+            // 手机登录 TODO 暂时不做验证码处理
+            List<StaffModel> staffModels = userMapper.selectList(new QueryWrapper<StaffModel>()
+                    .eq("contact", mobileNumber)
+            );
+            if (CollectionUtils.isEmpty(staffModels)) {
+                log.warn("not find user");
+                throw new SipException("登录失败，手机号码 " + mobileNumber + " 不存在");
+            }
+            // 设置登录数据
+            this.createLoginUserData(login, staffModels);
+        } catch (Exception e) {
+            login.put("status", "error");
+            login.put("errorMsg", e.getMessage());
+        }
+        return login;
     }
 }

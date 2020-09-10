@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -173,6 +174,25 @@ public class SelectUserServiceImpl implements ISelectUserService {
             }
             return featureVo;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取用户vo
+     *
+     * @param userId 用户id 学生或者老师
+     * @return UserVo
+     */
+    @Override
+    public UserVo getUserVoById(@NotBlank String userId) {
+        List<StudentVo> studentVos = studentService.getStudentVoListByIds(Collections.singletonList(userId));
+        if (!CollectionUtils.isEmpty(studentVos)) {
+            return this.studentVoToUserVo(studentVos.get(0));
+        }
+        List<UserVo> userVos = userService.getUserVoListByIds(Collections.singletonList(userId));
+        if (!CollectionUtils.isEmpty(userVos)) {
+            return userVos.get(0);
+        }
+        return null;
     }
 
     /**

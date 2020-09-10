@@ -46,4 +46,12 @@ public interface ISelectUserService {
      * @return List<IFeatureVo>
      */
     List<IFeatureVo> toFeatureCardVoList(List<? extends IModelToFeatureVo> featureVos);
+
+    /**
+     * 获取用户vo
+     *
+     * @param userId 用户id 学生或者老师
+     * @return UserVo
+     */
+    UserVo getUserVoById(String userId);
 }

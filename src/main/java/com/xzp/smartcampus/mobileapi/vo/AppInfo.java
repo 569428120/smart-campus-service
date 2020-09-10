@@ -34,6 +34,11 @@ public class AppInfo {
     private String url;
 
     /**
+     * 图标路径
+     */
+    private String iconUrl;
+
+    /**
      * 描述
      */
     private String description;

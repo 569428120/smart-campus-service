@@ -32,4 +32,14 @@ public class FeatureCardVo extends CardModel implements IFeatureVo {
      * 用户对象
      */
     private UserVo userVo;
+
+    @Override
+    public String getGroupId() {
+        return null;
+    }
+
+    @Override
+    public void setGroupId(String groupId) {
+
+    }
 }

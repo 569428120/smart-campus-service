@@ -53,6 +53,11 @@ public class MenuModel extends BaseModel {
     private String operateCode;
 
     /**
+     * 图标地址
+     */
+    private String iconUrl;
+
+    /**
      * 描述
      */
     @TableField(strategy = FieldStrategy.IGNORED)

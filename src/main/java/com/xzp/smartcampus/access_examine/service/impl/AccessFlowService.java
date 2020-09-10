@@ -13,7 +13,9 @@ import com.xzp.smartcampus.common.utils.SqlUtil;
 import com.xzp.smartcampus.common.utils.UserContext;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.StaffModel;
+import com.xzp.smartcampus.human.service.ISelectUserService;
 import com.xzp.smartcampus.human.service.IStaffUserService;
+import com.xzp.smartcampus.human.vo.UserVo;
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +37,9 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
 
     @Resource
     private IStaffUserService userService;
+
+    @Resource
+    private ISelectUserService selectUserService;
 
 
     @Override
@@ -85,8 +90,8 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
             log.warn("ExamineId  is null");
             throw new SipException("未指定审核人");
         }
-        StaffModel staffModel = userService.selectById(flowModel.getApplicantId());
-        if (staffModel == null) {
+        UserVo userVo = selectUserService.getUserVoById(flowModel.getApplicantId());
+        if (userVo == null) {
             log.warn("not find staffModel by id {}", flowModel.getApplicantId());
             throw new SipException("参数错误，找不到申请人 id " + flowModel.getApplicantId());
         }
@@ -105,10 +110,10 @@ public class AccessFlowService extends IsolationBaseService<AccessFlowMapper, Ac
         flowModel.setOriginatorCode(userInfo.getUserNumber());
         flowModel.setOriginatorName(userInfo.getName());
         // 申请人
-        flowModel.setApplicantId(staffModel.getId());
-        flowModel.setApplicantName(staffModel.getName());
-        flowModel.setApplicantType(staffModel.getUserType());
-        flowModel.setApplicantCode(staffModel.getUserJobCode());
+        flowModel.setApplicantId(userVo.getId());
+        flowModel.setApplicantName(userVo.getName());
+        flowModel.setApplicantType(userVo.getUserType());
+        flowModel.setApplicantCode(userVo.getUserJobCode());
         // 审核人信息
         flowModel.setExamineId(examineUser.getId());
         flowModel.setExamineName(examineUser.getName());

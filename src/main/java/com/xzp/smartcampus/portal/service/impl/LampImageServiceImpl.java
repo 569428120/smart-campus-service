@@ -38,7 +38,7 @@ public class LampImageServiceImpl extends NonIsolationBaseService<LampImageMappe
             throw new SipException("lampType is null");
         }
         // TODO 先放假数据
-        return Stream.of("http://gonglue.zjyhly.top/images/p1.jpg", "http://gz.lvxingsh.top/static/picture/79-1ZR12033549.jpg").map(url -> {
+        return Stream.of("https://scs-image.oss-cn-beijing.aliyuncs.com/test-image/Koala.jpg", "https://scs-image.oss-cn-beijing.aliyuncs.com/test-image/Lighthouse.jpg").map(url -> {
             LampImageModel lampImageModel = new LampImageModel();
             lampImageModel.setId(SqlUtil.getUUId());
             lampImageModel.setLampType(lampType.getKey());

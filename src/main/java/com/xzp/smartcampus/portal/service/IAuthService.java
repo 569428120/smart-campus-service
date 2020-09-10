@@ -3,6 +3,9 @@ package com.xzp.smartcampus.portal.service;
 
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Map;
 
 /**
@@ -27,4 +30,13 @@ public interface IAuthService {
      * @return LoginUserInfo
      */
     LoginUserInfo getLoginUserByToken(String token);
+
+    /**
+     * 手机号码登录
+     *
+     * @param mobileNumber     手机号码
+     * @param verificationCode 验证码
+     * @return 返回
+     */
+    Map<String, Object> mobileLogin(String mobileNumber, String verificationCode);
 }

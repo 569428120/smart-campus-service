@@ -85,7 +85,7 @@ public class NewsServiceImpl implements INewsService {
      */
     private List<NewsVo> getNewsVoListByGroupId(String groupId, boolean isDetail) {
 
-        return Stream.of("http://gonglue.zjyhly.top/images/p1.jpg", "http://gz.lvxingsh.top/static/picture/79-1ZR12033549.jpg").map(url -> {
+        return Stream.of("https://scs-image.oss-cn-beijing.aliyuncs.com/test-image/Hydrangeas.jpg", "https://scs-image.oss-cn-beijing.aliyuncs.com/test-image/Jellyfish.jpg").map(url -> {
             NewsVo newsVo = new NewsVo();
             newsVo.setId(SqlUtil.getUUId());
             newsVo.setGroupId(groupId);

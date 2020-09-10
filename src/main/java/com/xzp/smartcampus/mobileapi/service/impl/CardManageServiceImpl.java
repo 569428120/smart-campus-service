@@ -283,10 +283,11 @@ public class CardManageServiceImpl implements ICardManageService {
     private void createCardModel(CardPostParam param) {
         CardModel cardModel = new CardModel();
         cardModel.setId(SqlUtil.getUUId());
+        cardModel.setUserId(param.getUserId());
+        cardModel.setCardType(param.getCardType());
         cardModel.setCardNumber(param.getCardNumber());
         cardModel.setCardStatus(CardModel.STATUS_COMPLETE);
         cardModel.setServiceType(param.getServiceType());
-        cardModel.setCardType(param.getCardType());
         cardService.insert(cardModel);
     }
 
