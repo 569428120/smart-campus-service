@@ -14,6 +14,7 @@ import com.xzp.smartcampus.human.model.StudentGroupModel;
 import com.xzp.smartcampus.human.model.StudentModel;
 import com.xzp.smartcampus.human.service.IStudentGroupService;
 import com.xzp.smartcampus.human.service.IStudentService;
+import com.xzp.smartcampus.human.vo.ClassVo;
 import com.xzp.smartcampus.human.vo.StudentGroupTreeVo;
 import com.xzp.smartcampus.human.vo.UserGroupTreeVo;
 import lombok.extern.slf4j.Slf4j;
@@ -415,6 +416,22 @@ public class StudentGroupServiceImpl extends IsolationBaseService<StudentGroupMa
             return Collections.emptyList();
         }
         return studentModels;
+    }
+
+    /**
+     * 获取班级列表
+     *
+     * @return List<ClassVo>
+     */
+    @Override
+    public List<ClassVo> getClassVoList() {
+        List<StudentGroupModel> studentGroupModels = this.selectList(new QueryWrapper<StudentGroupModel>()
+                .eq("type", StudentGroupModel.TYPE_CLASS)
+        );
+        if (CollectionUtils.isEmpty(studentGroupModels)) {
+            return Collections.emptyList();
+        }
+        return studentGroupModels.stream().map(ClassVo::newInstance).collect(Collectors.toList());
     }
 
     /**

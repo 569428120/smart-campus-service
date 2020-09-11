@@ -8,6 +8,7 @@ import com.xzp.smartcampus.human.model.StaffModel;
 import com.xzp.smartcampus.human.model.StudentGroupModel;
 import com.xzp.smartcampus.human.service.IStaffUserService;
 import com.xzp.smartcampus.human.service.IStudentGroupService;
+import com.xzp.smartcampus.human.vo.ClassVo;
 import com.xzp.smartcampus.mobileapi.enums.LSStatusType;
 import com.xzp.smartcampus.mobileapi.mapper.LSRecordMapper;
 import com.xzp.smartcampus.mobileapi.model.LSExamineUserModel;
@@ -36,11 +37,11 @@ import java.util.stream.Collectors;
 public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper, LSRecordModel>
         implements ILeaveSchoolService {
     @Resource
-    IStudentGroupService studentGroupService;
+    private IStudentGroupService studentGroupService;
     @Resource
-    ILsExamineUserService userService;
+    private ILsExamineUserService userService;
     @Resource
-    IStaffUserService staffUserService;
+    private IStaffUserService staffUserService;
 
 
     /**
@@ -69,6 +70,7 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
      * @param pageSize
      * @return
      */
+    @Override
     public PageResult<LSRecordVo> selectLsRecord(LSRecordSearchParam param, Integer current, Integer pageSize) {
 
         PageResult<LSRecordModel> recordModelPageResult = this.selectPage(new Page<>(current, pageSize), new QueryWrapper<LSRecordModel>()
@@ -98,6 +100,7 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
      * @param pageSize
      * @return
      */
+    @Override
     public PageResult<LSRecordVo> selectLsApprovalRecord(LSRecordSearchParam param, Integer current, Integer pageSize) {
 
         PageResult<LSRecordModel> recordModelPageResult = this.selectPage(new Page<>(current, pageSize), new QueryWrapper<LSRecordModel>()
@@ -131,26 +134,20 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
     /**
      * 一键放学班级审核列表
      *
-     * @return
+     * @return List<ClassVo>
      */
-    public List<LSApprovalClassVo> selectLsApprovalClasses() {
-        List<String> classIds = this.selectList(
-                new QueryWrapper<LSRecordModel>().eq("ls_status", LSStatusType.APPROVAL.getKey()))
-                .stream().map(LSRecordModel::getClassId).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(classIds)) {
-            log.info("No classes is in approval status!");
-            return Collections.emptyList();
-        }
-        List<StudentGroupModel> groupModels = this.studentGroupService.selectByIds(classIds);
-
-        return groupModels.stream().map(this::generateClassVo).collect(Collectors.toList());
+    @Override
+    public List<ClassVo> selectLsApprovalClasses() {
+        return studentGroupService.getClassVoList();
     }
 
 
     /**
      * 一键放学审核人列表
+     *
      * @return
      */
+    @Override
     public List<StaffModel> selectLsExamineUsers() {
         List<LSExamineUserModel> userModels = this.userService.selectExamineUsers();
         if (userModels == null) {
@@ -164,24 +161,28 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
 
     /**
      * 新增一键放学记录(状态默认为待审核)
+     *
      * @param recordModel
      */
-    public void saveLsRecord(LSRecordModel recordModel){
+    @Override
+    public void saveLsRecord(LSRecordModel recordModel) {
         recordModel.setLsStatus(LSStatusType.APPROVAL.getKey());
         this.insert(recordModel);
     }
 
     /**
      * 同意一键放学
+     *
      * @param id
      */
-    public void confirmLsRecord(String id){
-        LSRecordModel recordModel=this.selectById(id);
-        if(recordModel==null){
-            log.warn("No Leave school record of this id:"+id);
+    @Override
+    public void confirmLsRecord(String id) {
+        LSRecordModel recordModel = this.selectById(id);
+        if (recordModel == null) {
+            log.warn("No Leave school record of this id:" + id);
             return;
         }
-        if(!recordModel.getLsStatus().equals(LSStatusType.APPROVAL.getKey())){
+        if (!recordModel.getLsStatus().equals(LSStatusType.APPROVAL.getKey())) {
             log.warn("This record is not in APPROVAL status!");
             return;
         }
@@ -191,44 +192,22 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
 
     /**
      * 拒绝一键放学
+     *
      * @param id
      */
-    public void denyLsRecord(String id){
-        LSRecordModel recordModel=this.selectById(id);
-        if(recordModel==null){
-            log.warn("No Leave school record of this id:"+id);
+    @Override
+    public void denyLsRecord(String id) {
+        LSRecordModel recordModel = this.selectById(id);
+        if (recordModel == null) {
+            log.warn("No Leave school record of this id:" + id);
             return;
         }
-        if(!recordModel.getLsStatus().equals(LSStatusType.APPROVAL.getKey())){
+        if (!recordModel.getLsStatus().equals(LSStatusType.APPROVAL.getKey())) {
             log.warn("This record is not in APPROVAL status!");
             return;
         }
         recordModel.setLsStatus(LSStatusType.DISAGREE.getKey());
         this.insert(recordModel);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

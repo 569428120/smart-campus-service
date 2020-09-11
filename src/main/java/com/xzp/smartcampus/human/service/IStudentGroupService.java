@@ -4,6 +4,7 @@ package com.xzp.smartcampus.human.service;
 import com.xzp.smartcampus.common.service.IBaseService;
 import com.xzp.smartcampus.human.model.StudentGroupModel;
 import com.xzp.smartcampus.human.model.StudentModel;
+import com.xzp.smartcampus.human.vo.ClassVo;
 import com.xzp.smartcampus.human.vo.StudentGroupTreeVo;
 import com.xzp.smartcampus.human.vo.UserGroupTreeVo;
 
@@ -78,4 +79,12 @@ public interface IStudentGroupService extends IBaseService<StudentGroupModel> {
      * @return List<StudentModel>
      */
     List<StudentModel> getStudentModelListByGroupId(String classId, String name, String number);
+
+
+    /**
+     * 获取班级列表
+     *
+     * @return List<ClassVo>
+     */
+    List<ClassVo> getClassVoList();
 }

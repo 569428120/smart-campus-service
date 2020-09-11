@@ -32,6 +32,21 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "tb_human_ser_student_group")
 public class StudentGroupModel extends BaseModel {
+
+    /**
+     * 年级
+     */
+    public static final String TYPE_GRADE = "grade";
+
+    /**
+     * 班级
+     */
+    public static final String TYPE_CLASS = "class";
+
+    /**
+     * 分组
+     */
+    public static final String TYPE_GROUP = "group";
     // 这些字段在 BaseModel 里
     // `id` varchar(32) NOT NULL COMMENT 'id', 自动增长
     //`region_id` varchar(32) DEFAULT NULL COMMENT '所属教育局',
