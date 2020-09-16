@@ -2,22 +2,25 @@ package com.xzp.smartcampus.mobileapi.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.service.IsolationBaseService;
+import com.xzp.smartcampus.common.utils.SqlUtil;
+import com.xzp.smartcampus.common.utils.UserContext;
 import com.xzp.smartcampus.common.vo.PageResult;
-import com.xzp.smartcampus.human.model.StaffModel;
 import com.xzp.smartcampus.human.model.StudentGroupModel;
+import com.xzp.smartcampus.human.service.IExamineUserService;
 import com.xzp.smartcampus.human.service.IStaffUserService;
 import com.xzp.smartcampus.human.service.IStudentGroupService;
 import com.xzp.smartcampus.human.vo.ClassVo;
+import com.xzp.smartcampus.human.vo.ExamineUserVo;
 import com.xzp.smartcampus.mobileapi.enums.LSStatusType;
 import com.xzp.smartcampus.mobileapi.mapper.LSRecordMapper;
-import com.xzp.smartcampus.mobileapi.model.LSExamineUserModel;
 import com.xzp.smartcampus.mobileapi.model.LSRecordModel;
 import com.xzp.smartcampus.mobileapi.service.ILeaveSchoolService;
-import com.xzp.smartcampus.mobileapi.service.ILsExamineUserService;
 import com.xzp.smartcampus.mobileapi.vo.LSApprovalClassVo;
 import com.xzp.smartcampus.mobileapi.vo.LSRecordSearchParam;
 import com.xzp.smartcampus.mobileapi.vo.LSRecordVo;
+import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -29,19 +32,17 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @Transactional
-public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper, LSRecordModel>
-        implements ILeaveSchoolService {
+public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper, LSRecordModel> implements ILeaveSchoolService {
     @Resource
     private IStudentGroupService studentGroupService;
     @Resource
-    private ILsExamineUserService userService;
-    @Resource
-    private IStaffUserService staffUserService;
+    private IExamineUserService examineUserService;
 
 
     /**
@@ -52,14 +53,19 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
      * @return
      */
     private List<LSRecordVo> newLSRecordVos(List<LSRecordModel> recordModels, List<StudentGroupModel> groupModels) {
-        List<LSRecordVo> lsRecordVos = new ArrayList<>();
-        for (int i = 0; i < recordModels.size(); i++) {
-            LSRecordVo recordVo = new LSRecordVo();
-            BeanUtils.copyProperties(recordModels.get(i), recordVo);
-            recordVo.setClassName(groupModels.get(i).getGroupName());
-            lsRecordVos.add(recordVo);
+        if (CollectionUtils.isEmpty(recordModels)) {
+            return Collections.emptyList();
         }
-        return lsRecordVos;
+        Map<String, StudentGroupModel> classIdToModelMap = groupModels.stream().collect(Collectors.toMap(StudentGroupModel::getId, k -> k));`
+        return recordModels.stream().map(item -> {
+            LSRecordVo recordVo = new LSRecordVo();
+            BeanUtils.copyProperties(item, recordVo);
+            StudentGroupModel groupModel = classIdToModelMap.get(item.getClassId());
+            if (groupModel != null) {
+                recordVo.setClassName(groupModel.getGradeLevel()+"");
+            }
+            return recordVo;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -148,15 +154,8 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
      * @return
      */
     @Override
-    public List<StaffModel> selectLsExamineUsers() {
-        List<LSExamineUserModel> userModels = this.userService.selectExamineUsers();
-        if (userModels == null) {
-            log.info("No Examine user!");
-            return Collections.emptyList();
-        }
-        List<String> userIds = userModels.stream().map(LSExamineUserModel::getExamineUserId).collect(Collectors.toList());
-
-        return this.staffUserService.selectByIds(userIds);
+    public List<ExamineUserVo> selectLsExamineUsers() {
+        return examineUserService.getLeaveSchoolExamineUserList(null, "", "");
     }
 
     /**
@@ -166,6 +165,13 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
      */
     @Override
     public void saveLsRecord(LSRecordModel recordModel) {
+        if (recordModel.getLeaveTime() == null) {
+            log.warn("leaveTime is null");
+            throw new SipException("放学时间不能为空");
+        }
+        LoginUserInfo userInfo = UserContext.getLoginUser();
+        recordModel.setId(SqlUtil.getUUId());
+        recordModel.setCreateById(userInfo.getUserId());
         recordModel.setLsStatus(LSStatusType.APPROVAL.getKey());
         this.insert(recordModel);
     }

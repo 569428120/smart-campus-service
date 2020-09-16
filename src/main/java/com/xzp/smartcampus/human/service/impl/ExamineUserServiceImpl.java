@@ -101,4 +101,25 @@ public class ExamineUserServiceImpl extends IsolationBaseService<ExamineUserMapp
         }
         return this.toExamineUserVos(examineUserModels);
     }
+
+    /**
+     * 一键放学审核人列表
+     *
+     * @param classId 班级id
+     * @param name    名称
+     * @param number  编号
+     * @return
+     */
+    @Override
+    public List<ExamineUserVo> getLeaveSchoolExamineUserList(String classId, String name, String number) {
+        List<ExamineUserModel> examineUserModels = this.selectList(new QueryWrapper<ExamineUserModel>()
+                .eq("examine_type", ExamineUserVo.EXAMINE_TYPE_LEAVE_SCHOOL)
+                .eq(StringUtils.isNotBlank(classId), "service_id", classId)
+        );
+        if (CollectionUtils.isEmpty(examineUserModels)) {
+            log.info("examineUserModels is null");
+            return Collections.emptyList();
+        }
+        return this.toExamineUserVos(examineUserModels);
+    }
 }

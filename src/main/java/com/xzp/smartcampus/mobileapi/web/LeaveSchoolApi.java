@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("mobileApi/leave-school")
 public class LeaveSchoolApi {
+
     @Resource
     private ILeaveSchoolService leaveSchoolService;
 
@@ -43,7 +45,7 @@ public class LeaveSchoolApi {
      * @param pageSize
      * @return
      */
-    @GetMapping("/gets/page")
+    @GetMapping("/approval/gets/page")
     public ResponseEntity<PageResult> getLeaveSchoolApprovalRecord(
             LSRecordSearchParam searchParam,
             @RequestParam(value = "current", defaultValue = "1") Integer current,
@@ -78,7 +80,7 @@ public class LeaveSchoolApi {
      * @return
      */
     @PostMapping("/posts")
-    public ResponseEntity<String> saveLsRecord(LSRecordModel recordModel) {
+    public ResponseEntity<String> saveLsRecord(@RequestBody @Valid LSRecordModel recordModel) {
         this.leaveSchoolService.saveLsRecord(recordModel);
         return ResponseEntity.ok("OK");
     }

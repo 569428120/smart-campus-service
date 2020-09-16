@@ -26,7 +26,7 @@ public class ClassVo {
     public static ClassVo newInstance(StudentGroupModel groupModel) {
         ClassVo classVo = new ClassVo();
         BeanUtils.copyProperties(groupModel, classVo);
-        classVo.setName(groupModel.getGroupName());
+        classVo.setName(groupModel.getGradeLevel() + "年级 " + groupModel.getGroupName());
         classVo.setNumber(groupModel.getGroupCode());
         return classVo;
     }
