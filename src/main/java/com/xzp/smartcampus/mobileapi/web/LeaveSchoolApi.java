@@ -1,14 +1,17 @@
 package com.xzp.smartcampus.mobileapi.web;
 
+import com.xzp.smartcampus.common.exception.SipException;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.mobileapi.model.LSRecordModel;
 import com.xzp.smartcampus.mobileapi.service.ILeaveSchoolService;
 import com.xzp.smartcampus.mobileapi.vo.LSRecordSearchParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 /**
@@ -93,6 +96,9 @@ public class LeaveSchoolApi {
      */
     @PostMapping("/posts/confirm")
     public ResponseEntity<String> confirmLsRecord(String leaveId) {
+        if (StringUtils.isBlank(leaveId)) {
+            throw new SipException("leaveId 不能为空");
+        }
         this.leaveSchoolService.confirmLsRecord(leaveId);
         return ResponseEntity.ok("OK");
     }
@@ -104,7 +110,10 @@ public class LeaveSchoolApi {
      * @return
      */
     @PostMapping("/posts/cancel")
-    public ResponseEntity<String> denyLsRecord(String leaveId) {
+    public ResponseEntity<String> denyLsRecord(@NotBlank(message = "leaveId 不能为空") String leaveId) {
+        if (StringUtils.isBlank(leaveId)) {
+            throw new SipException("leaveId 不能为空");
+        }
         this.leaveSchoolService.denyLsRecord(leaveId);
         return ResponseEntity.ok("OK");
     }

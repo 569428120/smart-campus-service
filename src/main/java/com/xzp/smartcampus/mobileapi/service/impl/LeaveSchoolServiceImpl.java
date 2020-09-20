@@ -56,13 +56,13 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
         if (CollectionUtils.isEmpty(recordModels)) {
             return Collections.emptyList();
         }
-        Map<String, StudentGroupModel> classIdToModelMap = groupModels.stream().collect(Collectors.toMap(StudentGroupModel::getId, k -> k));`
+        Map<String, StudentGroupModel> classIdToModelMap = groupModels.stream().collect(Collectors.toMap(StudentGroupModel::getId, k -> k));
         return recordModels.stream().map(item -> {
             LSRecordVo recordVo = new LSRecordVo();
             BeanUtils.copyProperties(item, recordVo);
             StudentGroupModel groupModel = classIdToModelMap.get(item.getClassId());
             if (groupModel != null) {
-                recordVo.setClassName(groupModel.getGradeLevel()+"");
+                recordVo.setClassName(groupModel.getGradeLevel() + "");
             }
             return recordVo;
         }).collect(Collectors.toList());
@@ -108,8 +108,9 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
      */
     @Override
     public PageResult<LSRecordVo> selectLsApprovalRecord(LSRecordSearchParam param, Integer current, Integer pageSize) {
-
+        LoginUserInfo userInfo = UserContext.getLoginUser();
         PageResult<LSRecordModel> recordModelPageResult = this.selectPage(new Page<>(current, pageSize), new QueryWrapper<LSRecordModel>()
+                .eq("examine_by_id", userInfo.getUserId())
                 .eq(StringUtils.isNotBlank(param.getClassId()), "class_id", param.getClassId())
                 .gt(StringUtils.isNotBlank(param.getStartTime()), "leave_time", param.getStartTime())
                 .lt(StringUtils.isNotBlank(param.getEndTime()), "leave_time", param.getEndTime())
@@ -169,6 +170,10 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
             log.warn("leaveTime is null");
             throw new SipException("放学时间不能为空");
         }
+        if (StringUtils.isBlank(recordModel.getExamineById())) {
+            log.warn("examineById is null");
+            throw new SipException("审核人不能为空");
+        }
         LoginUserInfo userInfo = UserContext.getLoginUser();
         recordModel.setId(SqlUtil.getUUId());
         recordModel.setCreateById(userInfo.getUserId());
@@ -193,7 +198,7 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
             return;
         }
         recordModel.setLsStatus(LSStatusType.AGREE.getKey());
-        this.insert(recordModel);
+        this.updateById(recordModel);
     }
 
     /**
@@ -213,7 +218,7 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
             return;
         }
         recordModel.setLsStatus(LSStatusType.DISAGREE.getKey());
-        this.insert(recordModel);
+        this.updateById(recordModel);
     }
 
 }
