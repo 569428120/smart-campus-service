@@ -9,4 +9,8 @@ import lombok.EqualsAndHashCode;
 public class LSRecordVo extends LSRecordModel {
     // 班级名称
     private String className;
+
+    private String createByName;
+
+    private String examineByName;
 }

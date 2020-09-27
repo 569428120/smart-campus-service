@@ -6,7 +6,9 @@ import com.xzp.smartcampus.human.vo.IModelToFeatureVo;
 import com.xzp.smartcampus.human.vo.UserGroupTreeVo;
 import com.xzp.smartcampus.human.vo.UserVo;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface ISelectUserService {
 
@@ -54,4 +56,12 @@ public interface ISelectUserService {
      * @return UserVo
      */
     UserVo getUserVoById(String userId);
+
+    /**
+     * 获取用户列表
+     *
+     * @param userIds userIds
+     * @return List<UserVo>
+     */
+    List<UserVo> getUserListVoByIds(Collection<String> userIds);
 }

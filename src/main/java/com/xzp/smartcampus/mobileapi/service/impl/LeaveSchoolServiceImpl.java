@@ -9,10 +9,12 @@ import com.xzp.smartcampus.common.utils.UserContext;
 import com.xzp.smartcampus.common.vo.PageResult;
 import com.xzp.smartcampus.human.model.StudentGroupModel;
 import com.xzp.smartcampus.human.service.IExamineUserService;
+import com.xzp.smartcampus.human.service.ISelectUserService;
 import com.xzp.smartcampus.human.service.IStaffUserService;
 import com.xzp.smartcampus.human.service.IStudentGroupService;
 import com.xzp.smartcampus.human.vo.ClassVo;
 import com.xzp.smartcampus.human.vo.ExamineUserVo;
+import com.xzp.smartcampus.human.vo.UserVo;
 import com.xzp.smartcampus.mobileapi.enums.LSStatusType;
 import com.xzp.smartcampus.mobileapi.mapper.LSRecordMapper;
 import com.xzp.smartcampus.mobileapi.model.LSRecordModel;
@@ -29,10 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,8 +40,12 @@ import java.util.stream.Collectors;
 public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper, LSRecordModel> implements ILeaveSchoolService {
     @Resource
     private IStudentGroupService studentGroupService;
+
     @Resource
     private IExamineUserService examineUserService;
+
+    @Resource
+    private ISelectUserService selectUserService;
 
 
     /**
@@ -56,13 +59,27 @@ public class LeaveSchoolServiceImpl extends IsolationBaseService<LSRecordMapper,
         if (CollectionUtils.isEmpty(recordModels)) {
             return Collections.emptyList();
         }
+        Set<String> userIds = new HashSet<>(recordModels.size());
+        recordModels.forEach(item -> {
+            userIds.add(item.getExamineById());
+            userIds.add(item.getCreateById());
+        });
+
         Map<String, StudentGroupModel> classIdToModelMap = groupModels.stream().collect(Collectors.toMap(StudentGroupModel::getId, k -> k));
+        Map<String, UserVo> userIdToVoMap = selectUserService.getUserListVoByIds(userIds).stream().collect(Collectors.toMap(UserVo::getId, k -> k));
+
         return recordModels.stream().map(item -> {
             LSRecordVo recordVo = new LSRecordVo();
             BeanUtils.copyProperties(item, recordVo);
             StudentGroupModel groupModel = classIdToModelMap.get(item.getClassId());
             if (groupModel != null) {
-                recordVo.setClassName(groupModel.getGradeLevel() + "");
+                recordVo.setClassName(groupModel.getGradeLevel() + "年级 " + groupModel.getGroupName());
+            }
+            if (StringUtils.isNotBlank(item.getCreateById()) && userIdToVoMap.containsKey(item.getCreateById())) {
+                recordVo.setCreateByName(userIdToVoMap.get(item.getCreateById()).getName());
+            }
+            if (StringUtils.isNotBlank(item.getExamineById()) && userIdToVoMap.containsKey(item.getExamineById())) {
+                recordVo.setExamineByName(userIdToVoMap.get(item.getExamineById()).getName());
             }
             return recordVo;
         }).collect(Collectors.toList());

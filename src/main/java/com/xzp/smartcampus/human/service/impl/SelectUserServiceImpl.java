@@ -18,10 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -193,6 +190,30 @@ public class SelectUserServiceImpl implements ISelectUserService {
             return userVos.get(0);
         }
         return null;
+    }
+
+    /**
+     * 获取用户列表
+     *
+     * @param userIds userIds
+     * @return List<UserVo>
+     */
+    @Override
+    public List<UserVo> getUserListVoByIds(Collection<String> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            log.warn("userIds is null");
+            return Collections.emptyList();
+        }
+        List<UserVo> userVos = new ArrayList<>();
+        List<StaffModel> staffModels = userService.selectByIds(userIds);
+        if (!CollectionUtils.isEmpty(staffModels)) {
+            userVos.addAll(userService.toUserVoLList(staffModels));
+        }
+        List<StudentVo> studentVos = studentService.getStudentVoListByIds(new ArrayList<>(userIds));
+        if (!CollectionUtils.isEmpty(studentVos)) {
+            userVos.addAll(studentVos.stream().map(this::studentVoToUserVo).collect(Collectors.toList()));
+        }
+        return userVos;
     }
 
     /**

@@ -38,4 +38,12 @@ public interface IStaffUserService extends IBaseService<StaffModel> {
      * @return List<UserVo>
      */
     List<UserVo> getUserVoListByIds(List<String> userIds);
+
+    /**
+     * 转换为vo对象
+     *
+     * @param data data
+     * @return List<UserVo>
+     */
+    List<UserVo> toUserVoLList(List<StaffModel> data);
 }

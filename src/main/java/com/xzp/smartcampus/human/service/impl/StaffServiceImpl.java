@@ -38,7 +38,8 @@ public class StaffServiceImpl extends IsolationBaseService<StaffMapper, StaffMod
         return new PageResult<>(modelPage.getTotal(), modelPage.getTotalPage(), this.toUserVoLList(modelPage.getData()));
     }
 
-    private List<UserVo> toUserVoLList(List<StaffModel> data) {
+    @Override
+    public List<UserVo> toUserVoLList(List<StaffModel> data) {
         if (CollectionUtils.isEmpty(data)) {
             return Collections.emptyList();
         }
