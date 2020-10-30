@@ -32,4 +32,16 @@ public class UserContext {
         }
         return loginUserInfo;
     }
+
+    /**
+     *  不保存，如果没有登录返回一个空数据的info
+     * @return LoginUserInfo
+     */
+    public static LoginUserInfo getNonErrorLoginUser() {
+        LoginUserInfo loginUserInfo = USER_LOCAL.get();
+        if (loginUserInfo == null) {
+            return new LoginUserInfo();
+        }
+        return loginUserInfo;
+    }
 }

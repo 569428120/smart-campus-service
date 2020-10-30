@@ -63,7 +63,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
 
     @Override
     public List<T> selectList(QueryWrapper<T> wrapper) {
-        LoginUserInfo userInfo = UserContext.getLoginUser();
+        LoginUserInfo userInfo = UserContext.getNonErrorLoginUser();
         this.initTenant(wrapper, userInfo);
         return this.list(wrapper);
     }
@@ -73,7 +73,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
         if (models == null || models.isEmpty()) {
             return;
         }
-        LoginUserInfo userInfo = UserContext.getLoginUser();
+        LoginUserInfo userInfo = UserContext.getNonErrorLoginUser();
         this.initTenant(models, userInfo);
         this.saveBatch(models);
     }
@@ -106,7 +106,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public void insert(T model) {
-        LoginUserInfo userInfo = UserContext.getLoginUser();
+        LoginUserInfo userInfo = UserContext.getNonErrorLoginUser();
         this.initTenant(model, userInfo);
         this.save(model);
     }
@@ -120,7 +120,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public PageResult<T> selectPage(Page<T> page, QueryWrapper<T> wrapper) {
-        LoginUserInfo userInfo = UserContext.getLoginUser();
+        LoginUserInfo userInfo = UserContext.getNonErrorLoginUser();
         this.initTenant(wrapper, userInfo);
         IPage<T> iPage = this.baseMapper.selectPage(page, wrapper);
         if (iPage == null) {
@@ -145,7 +145,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
 
     @Override
     public void delete(UpdateWrapper<T> wrapper) {
-        LoginUserInfo userInfo = UserContext.getLoginUser();
+        LoginUserInfo userInfo = UserContext.getNonErrorLoginUser();
         this.initTenant(wrapper, userInfo);
         baseMapper.delete(wrapper);
     }
@@ -158,7 +158,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public boolean updateById(T model) {
-        LoginUserInfo userInfo = UserContext.getLoginUser();
+        LoginUserInfo userInfo = UserContext.getNonErrorLoginUser();
         this.initTenant(model, userInfo);
         baseMapper.updateById(model);
         return true;
@@ -171,7 +171,7 @@ public abstract class BaseService<M extends BaseMapper<T>, T extends BaseModel> 
      */
     @Override
     public void updateBatch(Collection<T> models) {
-        LoginUserInfo userInfo = UserContext.getLoginUser();
+        LoginUserInfo userInfo = UserContext.getNonErrorLoginUser();
         this.initTenant(models, userInfo);
         this.updateBatchById(models);
     }

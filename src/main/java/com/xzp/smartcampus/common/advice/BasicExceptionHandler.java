@@ -26,12 +26,13 @@ public class BasicExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResult> handleException(Exception e) {
-        log.error("service error ", e);
         if (e instanceof SipException) {
+            log.warn(e.getMessage());
             SipException sipException = (SipException) e;
             return ResponseEntity.status(sipException.getCode())
                     .body(new ExceptionResult(sipException));
         }
+        log.error("service error ", e);
         return ResponseEntity.status(500)
                 .body(new ExceptionResult(500, e.getMessage()));
     }

@@ -285,4 +285,25 @@ public class AuthServiceImpl implements IAuthService {
         }
         return login;
     }
+
+    /**
+     * 创建登录对象
+     *
+     * @param currUser 用户
+     * @return LoginUserInfo
+     */
+    @Override
+    public LoginUserInfo createLoginUser(StaffModel currUser) {
+        LoginUserInfo userInfo = new LoginUserInfo();
+        userInfo.setUserId(currUser.getId());
+        userInfo.setUserType(currUser.getUserType());
+        userInfo.setUserNumber(currUser.getUserJobCode());
+        userInfo.setName(currUser.getName());
+        userInfo.setHisClass(this.getHisClassById(currUser.getId()));
+        userInfo.setCurrRegionInfo(this.getRegionInfoById(currUser.getRegionId()));
+        userInfo.setCurrSchoolInfo(this.getSchoolInfoById(currUser.getSchoolId()));
+        userInfo.setRegionInfoList(this.getRegionInfoListByIds(Collections.singleton(currUser.getRegionId())));
+        userInfo.setSchoolInfoList(this.getSchoolInfoListByIds(Collections.singleton(currUser.getSchoolId())));
+        return userInfo;
+    }
 }

@@ -33,6 +33,11 @@ public class StudentContactModel extends BaseModel {
     //`update_time` datetime DEFAULT NULL COMMENT '更新时间',
     //`logic_del` tinyint(2) DEFAULT NULL COMMENT '逻辑删除',
 
+    /**
+     * 家长
+     */
+    public static final String FAMILY_TYPE_PARENT = "parent";
+
     //`student_id` varchar(32) NOT NULL COMMENT '学生id',
     private String studentId;
 

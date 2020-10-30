@@ -1,6 +1,7 @@
 package com.xzp.smartcampus.portal.service;
 
 
+import com.xzp.smartcampus.human.model.StaffModel;
 import com.xzp.smartcampus.portal.vo.LoginUserInfo;
 
 import javax.validation.constraints.NotBlank;
@@ -39,4 +40,12 @@ public interface IAuthService {
      * @return 返回
      */
     Map<String, Object> mobileLogin(String mobileNumber, String verificationCode);
+
+    /**
+     * 创建登录对象
+     *
+     * @param staffModel 用户
+     * @return LoginUserInfo
+     */
+    LoginUserInfo createLoginUser(StaffModel staffModel);
 }

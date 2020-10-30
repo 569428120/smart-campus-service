@@ -1,5 +1,6 @@
 package com.xzp.smartcampus.mobileapi.vo;
 
+import com.xzp.smartcampus.system.model.MenuModel;
 import lombok.Data;
 
 /**
@@ -42,4 +43,23 @@ public class AppInfo {
      * 描述
      */
     private String description;
+
+    /**
+     * 创建实例
+     *
+     * @param groupModel groupModel
+     * @param item       item
+     * @return AppInfo
+     */
+    public static AppInfo newInstance(MenuModel groupModel, MenuModel item) {
+        AppInfo appInfo = new AppInfo();
+        appInfo.setId(item.getId());
+        appInfo.setAppName(item.getMenuName());
+        appInfo.setUrl(item.getRoute());
+        appInfo.setGroupId(item.getPid());
+        appInfo.setGroupName(groupModel == null ? "缺失" : groupModel.getMenuName());
+        appInfo.setIconUrl(item.getIconUrl());
+        appInfo.setDescription(item.getDescription());
+        return appInfo;
+    }
 }

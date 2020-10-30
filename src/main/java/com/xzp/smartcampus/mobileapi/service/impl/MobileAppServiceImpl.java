@@ -3,6 +3,7 @@ package com.xzp.smartcampus.mobileapi.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xzp.smartcampus.mobileapi.service.IMobileAppService;
 import com.xzp.smartcampus.mobileapi.vo.AppInfo;
+import com.xzp.smartcampus.system.enums.MenuType;
 import com.xzp.smartcampus.system.model.MenuModel;
 import com.xzp.smartcampus.system.service.IMobileMenuService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ public class MobileAppServiceImpl implements IMobileAppService {
         }
         // TODO 先不做权限控制全部查出来
         List<MenuModel> groupModels = mobileMenuService.selectList(new QueryWrapper<MenuModel>()
+                .eq("app_type", MenuType.MOBILE_MENU.getKey())
                 .eq("menu_level", 1)
         );
         Map<String, MenuModel> groupIdToModelMap = CollectionUtils.isEmpty(groupModels) ?
@@ -49,23 +51,13 @@ public class MobileAppServiceImpl implements IMobileAppService {
                 groupModels.stream().collect(Collectors.toMap(MenuModel::getId, v -> v));
 
         List<MenuModel> menuModels = mobileMenuService.selectList(new QueryWrapper<MenuModel>()
+                .eq("app_type", MenuType.MOBILE_MENU.getKey())
                 .eq("menu_level", 2)
         );
         if (CollectionUtils.isEmpty(menuModels)) {
             log.info("app list is null");
             return Collections.emptyList();
         }
-        return menuModels.stream().map(item -> {
-            MenuModel groupModel = groupIdToModelMap.get(item.getPid());
-            AppInfo appInfo = new AppInfo();
-            appInfo.setId(item.getId());
-            appInfo.setAppName(item.getMenuName());
-            appInfo.setUrl(item.getRoute());
-            appInfo.setGroupId(item.getPid());
-            appInfo.setGroupName(groupModel == null ? "缺失" : groupModel.getMenuName());
-            appInfo.setIconUrl(item.getIconUrl());
-            appInfo.setDescription(item.getDescription());
-            return appInfo;
-        }).collect(Collectors.toList());
+        return menuModels.stream().map(item -> AppInfo.newInstance(groupIdToModelMap.get(item.getPid()), item)).collect(Collectors.toList());
     }
 }

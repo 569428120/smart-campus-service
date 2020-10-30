@@ -32,7 +32,7 @@ public class LoginHandlerInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (request.getRequestURI().contains("auth/") || request.getRequestURI().contains("auth_routes")) {
+        if (request.getRequestURI().contains("auth/") || request.getRequestURI().contains("auth_routes") || request.getRequestURI().contains("authority/")) {
             log.info("to {}  " + request.getRequestURI());
             return true;
         }
